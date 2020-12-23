@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AspNetCore.Authentication.ReferenceToken.Events;
 
 namespace AspNetCore.Authentication.ReferenceToken
 {
@@ -17,11 +18,6 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// Invoked if Authorization fails and results in a Forbidden response.
         /// </summary>
         public Func<ForbiddenContext, Task> OnForbidden { get; set; } = context => Task.CompletedTask;
-
-        /// <summary>
-        /// Invoked when a protocol message is first received.
-        /// </summary>
-        public Func<MessageReceivedContext, Task> OnMessageReceived { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Invoked after the security token has passed validation and a ClaimsIdentity has been generated.
@@ -43,10 +39,6 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// </summary>
         public virtual Task Forbidden(ForbiddenContext context) => OnForbidden(context);
 
-        /// <summary>
-        /// Invoked when a protocol message is first received.
-        /// </summary>
-        public virtual Task MessageReceived(MessageReceivedContext context) => OnMessageReceived(context);
 
         /// <summary>
         /// Invoked after the security token has passed validation and a ClaimsIdentity has been generated.
@@ -57,5 +49,15 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// Invoked before a challenge is sent back to the caller.
         /// </summary>
         public virtual Task Challenge(ReferenceTokenChallengeContext context) => OnChallenge(context);
+
+        /// <summary>
+        /// Invoked when a protocol message is first received.
+        /// </summary>
+        public Func<MessageReceivedContext, Task> OnMessageReceived { get; set; } = context => Task.CompletedTask;
+
+        /// <summary>
+        /// Invoked when a protocol message is first received.
+        /// </summary>
+        public virtual Task MessageReceived(MessageReceivedContext context) => OnMessageReceived(context);
     }
 }

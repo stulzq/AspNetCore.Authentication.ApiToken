@@ -30,5 +30,16 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// Gets or sets the challenge to put in the "WWW-Authenticate" header.
         /// </summary>
         public string Challenge { get; set; } = ReferenceTokenDefaults.AuthenticationScheme;
+
+        /// <summary>
+        /// The object provided by the application to process events raised by the api key authentication middleware.
+        /// The application may implement the interface fully, or it may create an instance of <see cref="ReferenceTokenEvents"/>
+        /// and assign delegates only to the events it wants to process.
+        /// </summary>
+        public new ReferenceTokenEvents Events
+        {
+            get => (ReferenceTokenEvents)base.Events;
+            set => base.Events = value;
+        }
     }
 }

@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
-namespace AspNetCore.Authentication.ReferenceToken
+namespace AspNetCore.Authentication.ReferenceToken.Events
 {
     /// <summary>
-    /// A context for <see cref="ReferenceTokenEvents.OnTokenValidated"/>.
+    /// A <see cref="ResultContext{TOptions}"/> when access to a resource is forbidden.
     /// </summary>
-    public class TokenValidatedContext : ResultContext<ReferenceTokenOptions>
+    public class ForbiddenContext : ResultContext<ReferenceTokenOptions>
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="TokenValidatedContext"/>.
+        /// Initializes a new instance of <see cref="ForbiddenContext"/>.
         /// </summary>
         /// <inheritdoc />
-        public TokenValidatedContext(
+        public ForbiddenContext(
             HttpContext context,
             AuthenticationScheme scheme,
             ReferenceTokenOptions options)
             : base(context, scheme, options) { }
+        
 
     }
 }

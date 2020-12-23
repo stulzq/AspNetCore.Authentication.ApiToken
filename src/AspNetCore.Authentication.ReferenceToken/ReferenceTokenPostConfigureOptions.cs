@@ -30,7 +30,7 @@ namespace AspNetCore.Authentication.ReferenceToken
             }
         }
 
-        private void ValidateHeaderKey(ReferenceTokenOptions options)
+        private static void ValidateHeaderKey(ReferenceTokenOptions options)
         {
             if (options.ParseType == TokenParseType.Header && string.IsNullOrEmpty(options.HeaderKey))
             {
@@ -38,7 +38,7 @@ namespace AspNetCore.Authentication.ReferenceToken
             }
         }
 
-        private void ValidateQueryStringKey(ReferenceTokenOptions options)
+        private static void ValidateQueryStringKey(ReferenceTokenOptions options)
         {
             if (options.ParseType == TokenParseType.QueryString && string.IsNullOrEmpty(options.QueryStringKey))
             {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
-namespace AspNetCore.Authentication.ReferenceToken
+namespace AspNetCore.Authentication.ReferenceToken.Events
 {
     /// <summary>
     /// A <see cref="PropertiesContext{TOptions}"/> when access to a resource authenticated using Reference Token bearer is challenged.

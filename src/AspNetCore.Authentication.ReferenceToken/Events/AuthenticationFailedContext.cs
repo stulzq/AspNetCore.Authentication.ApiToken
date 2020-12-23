@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
-namespace AspNetCore.Authentication.ReferenceToken
+namespace AspNetCore.Authentication.ReferenceToken.Events
 {
     /// <summary>
     /// A <see cref="ResultContext{TOptions}"/> when authentication has failed.
@@ -23,5 +23,6 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// Gets or sets the exception associated with the authentication failure.
         /// </summary>
         public Exception Exception { get; set; }
+        public new AuthenticateResult Result { get; set; }
     }
 }

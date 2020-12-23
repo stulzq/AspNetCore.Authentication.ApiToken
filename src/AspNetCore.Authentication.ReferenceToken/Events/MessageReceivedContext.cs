@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
-namespace AspNetCore.Authentication.ReferenceToken
+namespace AspNetCore.Authentication.ReferenceToken.Events
 {
     /// <summary>
     /// A context for <see cref="ReferenceTokenEvents.OnMessageReceived"/>.
@@ -22,5 +22,7 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// Bearer Token. This will give the application an opportunity to retrieve a token from an alternative location.
         /// </summary>
         public string Token { get; set; }
+
+        public new AuthenticateResult Result { get; set; }
     }
 }

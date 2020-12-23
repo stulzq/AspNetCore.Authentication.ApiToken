@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AspNetCore.Authentication.ReferenceToken.Events;
 using AspNetCore.Authentication.ReferenceToken.Exceptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,8 @@ namespace AspNetCore.Authentication.ReferenceToken
 {
     public class ReferenceTokenHandler: AuthenticationHandler<ReferenceTokenOptions>
     {
+        private readonly ReferenceTokenOptions _options;
+
         /// <summary>
         /// Initializes a new instance of <see cref="ReferenceTokenHandler"/>.
         /// </summary>
@@ -25,6 +28,7 @@ namespace AspNetCore.Authentication.ReferenceToken
             UrlEncoder encoder, 
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
+            _options = options.CurrentValue;
         }
 
         /// <summary>
@@ -33,11 +37,66 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// </summary>
         protected new ReferenceTokenEvents Events
         {
-            get => (ReferenceTokenEvents)base.Events!;
+            get => (ReferenceTokenEvents)base.Events;
             set => base.Events = value;
         }
 
         protected override Task<object> CreateEventsAsync() => Task.FromResult<object>(new ReferenceTokenEvents());
+
+        protected virtual string ParseToken()
+        {
+            string token;
+            
+            switch (_options.ParseType)
+            {
+                case TokenParseType.Header:
+                    token = ParseTokenFromHeader();
+                    break;
+                case TokenParseType.QueryString:
+                    token = ParseTokenFromQueryString();
+                    break;
+                default:
+                {
+                    token = ParseTokenFromQueryString();
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        token = ParseTokenFromHeader();
+                    }
+
+                    break;
+                }
+            }
+
+            if (token != null && token.Length != 64)
+            {
+                return null;
+            }
+
+            return token;
+        }
+
+        private string ParseTokenFromHeader()
+        {
+            string authorization = Request.Headers[Options.HeaderKey];
+
+            if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                return authorization.Substring("Bearer ".Length).Trim();
+
+            }
+
+            return null;
+        }
+
+        private string ParseTokenFromQueryString()
+        {
+            if (Request.Query.ContainsKey(_options.QueryStringKey))
+            {
+                return Request.Query[_options.QueryStringKey];
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Searches the 'Authorization' header for a 'Bearer' token.
@@ -52,7 +111,6 @@ namespace AspNetCore.Authentication.ReferenceToken
 
                 // event can set the token
                 await Events.MessageReceived(messageReceivedContext);
-
                 if (messageReceivedContext.Result != null)
                 {
                     return messageReceivedContext.Result;
@@ -60,52 +118,40 @@ namespace AspNetCore.Authentication.ReferenceToken
 
                 // If application retrieved token from somewhere else, use that.
                 var token = messageReceivedContext.Token;
+                
+                if (string.IsNullOrEmpty(token))
+                {
+                    token = ParseToken();
+                }
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    string authorization = Request.Headers[Options.HeaderKey];
-
-                    // If no authorization header found, nothing to process further
-                    if (string.IsNullOrEmpty(authorization))
-                    {
-                        return AuthenticateResult.NoResult();
-                    }
-
-                    if (authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                    {
-                        token = authorization.Substring("Bearer ".Length).Trim();
-                    }
-
-                    // If no token found, no further work possible
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        return AuthenticateResult.NoResult();
-                    }
+                    return AuthenticateResult.NoResult();
                 }
 
-                List<Exception> validationFailures = null;
-                
-                //TODO 验证Token
-                
+                //List<Exception> validationFailures = null;
 
-                if (validationFailures != null)
-                {
-                    var authenticationFailedContext = new AuthenticationFailedContext(Context, Scheme, Options)
-                    {
-                        Exception = (validationFailures.Count == 1) ? validationFailures[0] : new AggregateException(validationFailures)
-                    };
+                //TODO 验证Token https://github.com/dotnet/aspnetcore/blob/71a046bd88f9ce469e76ddea492de02bfae79252/src/Security/Authentication/JwtBearer/src/JwtBearerHandler.cs
 
-                    await Events.AuthenticationFailed(authenticationFailedContext);
-                    
-                    if (authenticationFailedContext.Result!=null)
-                    {
-                        return authenticationFailedContext.Result;
-                    }
-                    
-                    return AuthenticateResult.Fail(authenticationFailedContext.Exception);
-                }
 
-                return AuthenticateResult.Fail("No SecurityTokenValidator available for token: " + token ?? "[null]");
+                // if (validationFailures != null)
+                // {
+                //     var authenticationFailedContext = new AuthenticationFailedContext(Context, Scheme, Options)
+                //     {
+                //         Exception = (validationFailures.Count == 1) ? validationFailures[0] : new AggregateException(validationFailures)
+                //     };
+                //
+                //     await Events.AuthenticationFailed(authenticationFailedContext);
+                //     
+                //     if (authenticationFailedContext.Result!=null)
+                //     {
+                //         return authenticationFailedContext.Result;
+                //     }
+                //     
+                //     return AuthenticateResult.Fail(authenticationFailedContext.Exception);
+                // }
+
+                return AuthenticateResult.Fail("No TokenValidator available for token: " + token );
             }
             catch (Exception ex)
             {
@@ -132,7 +178,7 @@ namespace AspNetCore.Authentication.ReferenceToken
             var authResult = await HandleAuthenticateOnceSafeAsync();
             var eventContext = new ReferenceTokenChallengeContext(Context, Scheme, Options, properties)
             {
-                AuthenticateFailure = authResult?.Failure
+                AuthenticateFailure = authResult.Failure
             };
 
             // Avoid returning error=invalid_token if the error is not caused by an authentication failure (e.g missing token).
@@ -200,7 +246,6 @@ namespace AspNetCore.Authentication.ReferenceToken
             }
         }
         
-
         protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
         {
             var forbiddenContext = new ForbiddenContext(Context, Scheme, Options);
@@ -236,5 +281,7 @@ namespace AspNetCore.Authentication.ReferenceToken
 
             return string.Join("; ", messages);
         }
+
+        
     }
 }

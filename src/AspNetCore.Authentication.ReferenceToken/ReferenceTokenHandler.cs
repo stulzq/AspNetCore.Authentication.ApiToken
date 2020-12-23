@@ -46,8 +46,15 @@ namespace AspNetCore.Authentication.ReferenceToken
         protected virtual string ParseToken()
         {
             string token;
+            var type = _options.ParseType;
             
-            switch (_options.ParseType)
+            var attr = Context.GetEndpoint()?.Metadata.GetMetadata<TokenParseAttribute>();
+            if (attr != null)
+            {
+                type = attr.Type;
+            }
+            
+            switch (type)
             {
                 case TokenParseType.Header:
                     token = ParseTokenFromHeader();

@@ -5,11 +5,11 @@ namespace AspNetCore.Authentication.ReferenceToken
     [AttributeUsage(AttributeTargets.Method)]
     public class TokenParseAttribute : Attribute
     {
-        public TokenParseType ResolveType { get; }
+        public TokenParseType Type { get; }
 
-        public TokenParseAttribute(TokenParseType resolveType = TokenParseType.Both)
+        public TokenParseAttribute(TokenParseType type = TokenParseType.Both)
         {
-            ResolveType = resolveType;
+            Type = type;
         }
     }
 }

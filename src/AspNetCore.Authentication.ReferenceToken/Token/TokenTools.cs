@@ -11,7 +11,7 @@ namespace AspNetCore.Authentication.ReferenceToken
     /// <para></para>
     /// SHA256 + HEX
     /// </summary>
-    public class TokenGenerator
+    public class TokenTools
     {
         public static string CreateReferenceToken(string userId)
         {

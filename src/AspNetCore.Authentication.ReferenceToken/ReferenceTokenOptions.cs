@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AspNetCore.Authentication.ReferenceToken
 {
@@ -41,5 +42,9 @@ namespace AspNetCore.Authentication.ReferenceToken
             get => (ReferenceTokenEvents)base.Events;
             set => base.Events = value;
         }
+
+        public TimeSpan TokenExpire { get; set; } = TimeSpan.FromHours(1);
+        
+        public TimeSpan RefreshTokenExpire { get; set; } = TimeSpan.FromHours(24);
     }
 }

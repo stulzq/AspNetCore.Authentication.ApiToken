@@ -8,7 +8,7 @@
         public const string AuthenticationScheme = "Reference";
 
         /// <summary>
-        /// Get token from request header key
+        /// Get token from request header key, eg. Authorization: Bearer xxx
         /// </summary>
         public const string TokenParseHeaderKey = "Authorization";
 

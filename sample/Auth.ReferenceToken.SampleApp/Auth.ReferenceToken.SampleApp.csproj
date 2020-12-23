@@ -1,13 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Nullable>disable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 
   <PropertyGroup Label="Document">
     <WarningsAsErrors>NU1605;NU1701</WarningsAsErrors>
@@ -16,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="logs\**" />
-    <None Remove="*.DotSettings" />
+    <ProjectReference Include="..\..\src\AspNetCore.Authentication.ReferenceToken\AspNetCore.Authentication.ReferenceToken.csproj" />
   </ItemGroup>
+
 
 </Project>

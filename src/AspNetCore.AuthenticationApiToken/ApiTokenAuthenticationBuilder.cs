@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using AspNetCore.Authentication.ApiToken.Abstractions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AspNetCore.Authentication.ApiToken
@@ -11,7 +12,17 @@ namespace AspNetCore.Authentication.ApiToken
         {
             Services = builder.Services;
         }
-        
 
+        public ApiTokenAuthenticationBuilder AddProfileService<TProfileService>() where TProfileService : class
+        {
+            Services.AddTransient(typeof(IApiTokenProfileService), typeof(TProfileService));
+            return this;
+        }
+
+        public ApiTokenAuthenticationBuilder AddTokenStore<TTokenStore>() where TTokenStore : class
+        {
+            Services.AddScoped(typeof(IApiTokenStore), typeof(TTokenStore));
+            return this;
+        }
     }
 }

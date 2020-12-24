@@ -10,7 +10,7 @@ namespace AspNetCore.Authentication.ApiToken
             throw new System.NotImplementedException();
         }
 
-        public Task SetAsync(ApiToken token)
+        public Task SetAsync(ApiTokenModel token)
         {
             throw new System.NotImplementedException();
         }
@@ -20,7 +20,7 @@ namespace AspNetCore.Authentication.ApiToken
             throw new System.NotImplementedException();
         }
 
-        public Task RemoveAsync(ApiToken token, string reason = null)
+        public Task RemoveAsync(ApiTokenModel token, string reason = null)
         {
             throw new System.NotImplementedException();
         }

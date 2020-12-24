@@ -61,6 +61,11 @@ namespace AspNetCore.Authentication.ApiToken
         /// <returns>A reference to <paramref name="builder"/> after the operation has completed.</returns>
         public static ApiTokenAuthenticationBuilder AddApiToken(this AuthenticationBuilder builder, string authenticationScheme, string displayName, Action<ApiTokenOptions> configureOptions)
         {
+            if (configureOptions == null)
+            {
+                throw new ArgumentNullException(nameof(configureOptions));
+            }
+            
             builder.Services.AddSingleton<IApiTokenCacheService, NullApiTokenCacheService>();
             builder.Services.AddTransient<IApiTokenValidator, DefaultApiTokenValidator>();
             builder.Services.AddTransient<IApiTokenOperator, DefaultApiTokenOperator>();

@@ -33,7 +33,7 @@ namespace AspNetCore.Authentication.ApiToken
 
             await RemoveOldTokenAsync(userId);
 
-            await _tokenStore.StoreAsync(new List<ApiToken>() { result.Token, result.Refresh });
+            await _tokenStore.StoreAsync(new List<ApiTokenModel>() { result.Token, result.Refresh });
 
             if (_options.UseCache)
             {
@@ -46,7 +46,7 @@ namespace AspNetCore.Authentication.ApiToken
         private ApiTokenCreateResult CreateByUserClaims(string userId, Claim[] claims)
         {
             var now = DateTime.Now;
-            var token = new ApiToken()
+            var token = new ApiTokenModel()
             {
                 Token = ApiTokenTools.CreateToken(userId),
                 CreateTime = now,
@@ -56,7 +56,7 @@ namespace AspNetCore.Authentication.ApiToken
                 Expiration = now + _options.TokenExpire
             };
 
-            var refreshToken = new ApiToken()
+            var refreshToken = new ApiTokenModel()
             {
                 Token = ApiTokenTools.CreateToken(userId),
                 CreateTime = now,
@@ -108,7 +108,7 @@ namespace AspNetCore.Authentication.ApiToken
 
             await RemoveOldTokenAsync(token.UserId);
 
-            await _tokenStore.StoreAsync(new List<ApiToken>() { result.Token, result.Refresh });
+            await _tokenStore.StoreAsync(new List<ApiTokenModel>() { result.Token, result.Refresh });
 
             if (_options.UseCache)
             {

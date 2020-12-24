@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace AspNetCore.ApiTOken.SampleApp
+namespace AspNetCore.ApiToken.SampleApp
 {
     public class Program
     {

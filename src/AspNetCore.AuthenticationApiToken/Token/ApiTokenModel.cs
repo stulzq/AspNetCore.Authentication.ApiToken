@@ -3,7 +3,7 @@ using System.Security.Claims;
 
 namespace AspNetCore.Authentication.ApiToken
 {
-    public class ApiToken
+    public class ApiTokenModel
     {
         public string Token { get; set; }
 

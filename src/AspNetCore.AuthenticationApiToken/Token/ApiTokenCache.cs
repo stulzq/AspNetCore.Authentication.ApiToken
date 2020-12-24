@@ -2,7 +2,7 @@
 {
     public class ApiTokenCache
     {
-        public ApiToken Token { get; set; }
+        public ApiTokenModel Token { get; set; }
         public bool Available => Token != null;
         public string Reason { get; set; }
     }

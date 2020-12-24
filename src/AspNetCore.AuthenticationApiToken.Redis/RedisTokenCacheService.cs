@@ -40,7 +40,7 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             return MessagePackSerializer.Deserialize<ApiTokenCache>(cacheData, ContractlessStandardResolver.Options);
         }
 
-        public async Task SetAsync(ApiToken token)
+        public async Task SetAsync(ApiTokenModel token)
         {
             TimeSpan ttl;
             if (token.IsExpired(_tokenOptions.TokenExpireClockSkew))
@@ -66,7 +66,7 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             }
         }
 
-        public async Task RemoveAsync(ApiToken token, string reason = null)
+        public async Task RemoveAsync(ApiTokenModel token, string reason = null)
         {
             var key = string.Format(_tokenCacheKeyPrefix, token.Token);
             if (string.IsNullOrEmpty(reason))

@@ -6,18 +6,18 @@ namespace AspNetCore.Authentication.ApiToken.Abstractions
 {
     public interface IApiTokenStore
     {
-        Task StoreAsync(ApiToken token);
-        Task StoreAsync(List<ApiToken> token);
+        Task StoreAsync(ApiTokenModel token);
+        Task StoreAsync(List<ApiTokenModel> token);
 
-        Task<ApiToken> GetAsync(string token);
+        Task<ApiTokenModel> GetAsync(string token);
 
-        Task<List<ApiToken>> GetListAsync(string userId);
+        Task<List<ApiTokenModel>> GetListAsync(string userId);
 
-        Task<ApiToken> UpdateClaimsAsync(string token,Claim[] claims);
+        Task<ApiTokenModel> UpdateClaimsAsync(string token,Claim[] claims);
 
-        Task<ApiToken> RemoveAsync(string token);
+        Task<ApiTokenModel> RemoveAsync(string token);
 
-        Task<ApiToken> RemoveListAsync(string userId);
+        Task<ApiTokenModel> RemoveListAsync(string userId);
 
         Task RemoveExpirationAsync();
     }

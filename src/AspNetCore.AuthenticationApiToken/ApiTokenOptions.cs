@@ -9,7 +9,7 @@ namespace AspNetCore.Authentication.ApiToken
         /// <summary>
         /// Set where to parse the token. Default <see cref="ApiTokenParseType.Both"/>
         /// </summary>
-        public ApiTokenParseType ParseType { get; set; }
+        public ApiTokenParseType ParseType { get; set; } = ApiTokenParseType.Both;
 
         /// <summary>
         /// Token parse from request header key. Default <see cref="ApiTokenDefaults.TokenParseHeaderKey"/>

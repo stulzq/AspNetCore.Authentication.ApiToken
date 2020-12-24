@@ -21,7 +21,7 @@ namespace AspNetCore.Authentication.ApiToken
         }
         public virtual async Task<ClaimsPrincipal> ValidateTokenAsync([NotNull] string token, string schemeName)
         {
-            ApiToken tokenModel = null;
+            ApiTokenModel tokenModel = null;
 
             //Get from cache
             if (_options.UseCache)

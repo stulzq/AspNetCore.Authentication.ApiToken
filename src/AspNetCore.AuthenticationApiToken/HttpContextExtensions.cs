@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
+using AspNetCore.Authentication.ApiToken;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 
-namespace AspNetCore.Authentication.ApiToken
+// ReSharper disable once CheckNamespace
+namespace Microsoft.AspNetCore.Http
 {
     public static class HttpContextExtensions
     {

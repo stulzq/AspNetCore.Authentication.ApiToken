@@ -31,25 +31,9 @@ namespace AspNetCore.Authentication.ReferenceToken
             var claims = await _profileService.GetUserClaimsAsync(userId);
             var result = CreateByUserClaims(userId, claims);
 
-            if (!_options.AllowMultiTokenActive)
-            {
-                const string reason = "Only one token active at the same time is allowed.";
+            await RemoveOldTokenAsync(userId);
 
-                //Remove old token from cache
-                if (_options.UseCache)
-                {
-                    var tokenList = await _tokenStore.GetListAsync(userId);
-                    foreach (var token in tokenList)
-                    {
-                        await _cacheService.RemoveAsync(token, reason);
-                    }
-                }
-
-                //Remove old token from db
-                await _tokenStore.RemoveListAsync(userId, reason);
-            }
-
-            await _tokenStore.StoreAsync(new List<TokenModel>() {result.Token, result.Refresh});
+            await _tokenStore.StoreAsync(new List<TokenModel>() { result.Token, result.Refresh });
 
             if (_options.UseCache)
             {
@@ -85,6 +69,27 @@ namespace AspNetCore.Authentication.ReferenceToken
             return TokenCreateResult.Success(token, refreshToken);
         }
 
+        private async Task RemoveOldTokenAsync(string userId)
+        {
+            if (!_options.AllowMultiTokenActive)
+            {
+                const string reason = "Only one token active at the same time is allowed.";
+
+                //Remove old token from cache
+                if (_options.UseCache)
+                {
+                    var tokenList = await _tokenStore.GetListAsync(userId);
+                    foreach (var tokenItem in tokenList)
+                    {
+                        await _cacheService.RemoveAsync(tokenItem, reason);
+                    }
+                }
+
+                //Remove old token from db
+                await _tokenStore.RemoveListAsync(userId);
+            }
+        }
+
         public virtual async Task<TokenCreateResult> RefreshAsync(string refreshToken)
         {
             var token = await _tokenStore.GetAsync(refreshToken);
@@ -93,13 +98,15 @@ namespace AspNetCore.Authentication.ReferenceToken
                 return TokenCreateResult.Failed("invalid refresh_token");
             }
 
-            if (token.CheckExpiration())
+            if (token.IsExpired(_options.TokenExpireClockSkew))
             {
                 return TokenCreateResult.Failed($"The refresh_token expired at '{token.Expiration.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'");
             }
 
             var claims = await _profileService.GetUserClaimsAsync(token.UserId);
             var result = CreateByUserClaims(token.UserId, claims);
+
+            await RemoveOldTokenAsync(token.UserId);
 
             await _tokenStore.StoreAsync(new List<TokenModel>() { result.Token, result.Refresh });
 
@@ -149,7 +156,7 @@ namespace AspNetCore.Authentication.ReferenceToken
             }
 
             //Remove from db
-            await _tokenStore.RemoveAsync(token, reason);
+            await _tokenStore.RemoveAsync(token);
         }
     }
 }

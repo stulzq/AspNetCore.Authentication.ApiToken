@@ -17,13 +17,18 @@ namespace AspNetCore.Authentication.ReferenceToken
         public Claim[] Claims { get; set; }
 
         public DateTimeOffset CreateTime { get; set; }
-        
+
         public DateTimeOffset Expiration { get; set; }
 
-        public bool CheckExpiration()
+        public bool IsExpired(TimeSpan clockSkew)
         {
-            return Expiration.UtcDateTime < DateTimeOffset.UtcNow;
+            return (DateTimeOffset.UtcNow - Expiration.UtcDateTime - clockSkew).TotalSeconds > 0;
         }
-        
+
+        public TimeSpan GetLifeTime(TimeSpan clockSkew)
+        {
+            return DateTimeOffset.UtcNow - Expiration.UtcDateTime - clockSkew;
+        }
+
     }
 }

@@ -21,6 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MessagePack" Version="2.2.85" />
+    <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AspNetCore.Authentication.ReferenceToken\AspNetCore.Authentication.ReferenceToken.csproj" />
   </ItemGroup>
 

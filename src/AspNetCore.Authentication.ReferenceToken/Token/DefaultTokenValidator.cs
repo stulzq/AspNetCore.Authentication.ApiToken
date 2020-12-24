@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ReferenceToken.Abstractions;
-using AspNetCore.Authentication.ReferenceToken.Events;
 using AspNetCore.Authentication.ReferenceToken.Exceptions;
 using Microsoft.Extensions.Options;
 
@@ -33,7 +32,7 @@ namespace AspNetCore.Authentication.ReferenceToken
                 {
                     if (!tokenCache.Available)
                     {
-                        throw new TokenInvalidException(tokenCache.Reason);
+                        throw new TokenInvalidException(tokenCache.Reason ?? "invalid_token");
                     }
 
                     tokenModel = tokenCache.Token;
@@ -59,11 +58,11 @@ namespace AspNetCore.Authentication.ReferenceToken
                     await _cacheService.SetNullAsync(token);
                 }
 
-                throw new TokenInvalidException("invalid token");
+                throw new TokenInvalidException("invalid_token");
             }
 
             //Check expiration
-            if (tokenModel.CheckExpiration())
+            if (tokenModel.IsExpired(_options.TokenExpireClockSkew))
             {
                 throw new TokenExpiredException(tokenModel.Expiration.DateTime);
             }

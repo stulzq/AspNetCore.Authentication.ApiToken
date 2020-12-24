@@ -15,9 +15,9 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
 
         Task<TokenModel> UpdateClaimsAsync(string token,Claim[] claims);
 
-        Task<TokenModel> RemoveAsync(string token, string reason);
+        Task<TokenModel> RemoveAsync(string token);
 
-        Task<TokenModel> RemoveListAsync(string userId, string reason);
+        Task<TokenModel> RemoveListAsync(string userId);
 
         Task RemoveExpirationAsync();
     }

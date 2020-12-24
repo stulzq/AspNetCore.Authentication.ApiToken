@@ -49,6 +49,8 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// </summary>
         public TimeSpan TokenExpire { get; set; } = TimeSpan.FromHours(1);
 
+        public TimeSpan TokenExpireClockSkew { get; set; } = TimeSpan.FromMinutes(10);
+
         /// <summary>
         /// Refresh token expire time. Default: 24 hour.
         /// </summary>
@@ -60,9 +62,10 @@ namespace AspNetCore.Authentication.ReferenceToken
         public bool AllowMultiTokenActive { get; set; } = true;
 
         /// <summary>
-        /// Unit: sec.
+        /// Hosted Service Periodically run clean stored expired token, use <see cref="ITokenStore.RemoveExpirationAsync"/>. Unit: sec.
         /// </summary>
         public int ExpiredTokenCleanInterval { get; set; } = 86400;
+
 
         /// <summary>
         /// Use cache <see cref="ITokenCacheService"/>

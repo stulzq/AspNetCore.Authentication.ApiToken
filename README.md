@@ -1,1 +1,1 @@
-# AspNetCore.Authentication.ReferenceToken
+# AspNetCore.Authentication.ApiToken

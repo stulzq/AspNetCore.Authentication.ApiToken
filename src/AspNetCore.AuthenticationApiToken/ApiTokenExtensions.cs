@@ -69,7 +69,7 @@ namespace AspNetCore.Authentication.ApiToken
             builder.Services.AddSingleton<IApiTokenCacheService, NullApiTokenCacheService>();
             builder.Services.AddTransient<IApiTokenValidator, DefaultApiTokenValidator>();
             builder.Services.AddTransient<IApiTokenOperator, DefaultApiTokenOperator>();
-
+            //TODO Hosted Service, Code comment
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<ApiTokenOptions>, ApiTokenPostConfigureOptions>());
             builder.AddScheme<ApiTokenOptions, ApiTokenHandler>(authenticationScheme, displayName, configureOptions);
 

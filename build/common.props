@@ -1,0 +1,29 @@
+<Project>
+
+  <Import Project="version.props" />
+
+  <PropertyGroup Label="Package">
+    <Authors>Zhiqiang Li</Authors>
+    <RepositoryUrl>https://github.com/stulzq/AspNetCore.Authentication.ApiToken.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageProjectUrl>https://github.com/stulzq/AspNetCore.Authentication.ApiToken</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageTags>aspnetcore,authentication,apitoken</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Document">
+    <WarningsAsErrors>NU1605;NU1701</WarningsAsErrors>
+    <NoWarn>NU1701;1701;1702;1705;1591;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="logs\**" />
+    <None Remove="*.DotSettings" />
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

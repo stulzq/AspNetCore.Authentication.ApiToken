@@ -6,3 +6,5 @@ TODO:
 - [ ] Token Clean Service
 - [ ] Code annotation
 - [ ] Document
+- [ ] TokenModel rename
+- [ ] Create ITokenParser

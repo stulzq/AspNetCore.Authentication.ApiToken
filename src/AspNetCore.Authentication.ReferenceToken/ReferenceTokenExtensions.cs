@@ -1,4 +1,5 @@
 ﻿using System;
+using AspNetCore.Authentication.ReferenceToken.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -60,6 +61,12 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// <returns>A reference to <paramref name="builder"/> after the operation has completed.</returns>
         public static AuthenticationBuilder AddReferenceToken(this AuthenticationBuilder builder, string authenticationScheme, string displayName, Action<ReferenceTokenOptions> configureOptions)
         {
+            builder.Services.AddSingleton<ITokenCacheService, NullTokenCacheService>();
+            builder.Services.AddTransient<ITokenValidator, DefaultTokenValidator>();
+            builder.Services.AddTransient<ITokenOperator, DefaultTokenOperator>();
+
+            //store profile
+
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<ReferenceTokenOptions>, ReferenceTokenPostConfigureOptions>());
             return builder.AddScheme<ReferenceTokenOptions, ReferenceTokenHandler>(authenticationScheme, displayName, configureOptions);
         }

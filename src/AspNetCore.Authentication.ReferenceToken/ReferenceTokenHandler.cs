@@ -15,7 +15,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace AspNetCore.Authentication.ReferenceToken
 {
-    public class ReferenceTokenHandler: AuthenticationHandler<ReferenceTokenOptions>
+    public class ReferenceTokenHandler : AuthenticationHandler<ReferenceTokenOptions>
     {
         private readonly ITokenValidator _tokenValidator;
         private readonly ReferenceTokenOptions _options;
@@ -25,9 +25,9 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// </summary>
         /// <inheritdoc />
         public ReferenceTokenHandler(
-            IOptionsMonitor<ReferenceTokenOptions> options, 
+            IOptionsMonitor<ReferenceTokenOptions> options,
             ILoggerFactory logger,
-            UrlEncoder encoder, 
+            UrlEncoder encoder,
             ISystemClock clock,
             ITokenValidator tokenValidator) : base(options, logger, encoder, clock)
         {
@@ -51,13 +51,13 @@ namespace AspNetCore.Authentication.ReferenceToken
         {
             string token;
             var type = _options.ParseType;
-            
+
             var attr = Context.GetEndpoint()?.Metadata.GetMetadata<TokenParseAttribute>();
             if (attr != null)
             {
                 type = attr.Type;
             }
-            
+
             switch (type)
             {
                 case TokenParseType.Header:
@@ -67,15 +67,15 @@ namespace AspNetCore.Authentication.ReferenceToken
                     token = ParseTokenFromQueryString();
                     break;
                 default:
-                {
-                    token = ParseTokenFromQueryString();
-                    if (string.IsNullOrEmpty(token))
                     {
-                        token = ParseTokenFromHeader();
-                    }
+                        token = ParseTokenFromQueryString();
+                        if (string.IsNullOrEmpty(token))
+                        {
+                            token = ParseTokenFromHeader();
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             if (token != null && token.Length != 64)
@@ -129,7 +129,7 @@ namespace AspNetCore.Authentication.ReferenceToken
 
                 // If application retrieved token from somewhere else, use that.
                 var token = messageReceivedContext.Token;
-                
+
                 if (string.IsNullOrEmpty(token))
                 {
                     token = ParseToken();
@@ -144,7 +144,7 @@ namespace AspNetCore.Authentication.ReferenceToken
                 ClaimsPrincipal principal = null;
                 try
                 {
-                    principal = await _tokenValidator.ValidateTokenAsync(token);
+                    principal = await _tokenValidator.ValidateTokenAsync(token, Scheme.Name);
                 }
                 catch (Exception ex)
                 {
@@ -159,14 +159,14 @@ namespace AspNetCore.Authentication.ReferenceToken
                     {
                         Exception = validationFailure
                     };
-                
+
                     await Events.AuthenticationFailed(authenticationFailedContext);
-                    
-                    if (authenticationFailedContext.Result!=null)
+
+                    if (authenticationFailedContext.Result != null)
                     {
                         return authenticationFailedContext.Result;
                     }
-                    
+
                     return AuthenticateResult.Fail(authenticationFailedContext.Exception);
                 }
 
@@ -196,8 +196,8 @@ namespace AspNetCore.Authentication.ReferenceToken
                 };
 
                 await Events.AuthenticationFailed(authenticationFailedContext);
-                
-                if (authenticationFailedContext.Result!=null)
+
+                if (authenticationFailedContext.Result != null)
                 {
                     return authenticationFailedContext.Result;
                 }
@@ -205,7 +205,7 @@ namespace AspNetCore.Authentication.ReferenceToken
                 throw;
             }
         }
-        
+
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
             var authResult = await HandleAuthenticateOnceSafeAsync();
@@ -278,7 +278,7 @@ namespace AspNetCore.Authentication.ReferenceToken
                 Response.Headers.Append(HeaderNames.WWWAuthenticate, builder.ToString());
             }
         }
-        
+
         protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
         {
             var forbiddenContext = new ForbiddenContext(Context, Scheme, Options);
@@ -290,14 +290,15 @@ namespace AspNetCore.Authentication.ReferenceToken
         {
             string message = authFailure switch
             {
-                ReferenceTokenExpiredException rte =>
-                    $"The token expired at '{rte.ExpireAt.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'",
+                TokenExpiredException ee =>
+                    $"The token expired at '{ee.ExpireAt.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'",
+                TokenInvalidException ue => ue.Message,
                 _ => authFailure.Message
             };
 
             return message;
         }
 
-        
+
     }
 }

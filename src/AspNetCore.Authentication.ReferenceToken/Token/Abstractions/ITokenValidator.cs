@@ -5,6 +5,6 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
 {
     public interface ITokenValidator
     {
-        Task<ClaimsPrincipal> ValidateTokenAsync(string token);
+        Task<ClaimsPrincipal> ValidateTokenAsync(string token, string schemeName);
     }
 }

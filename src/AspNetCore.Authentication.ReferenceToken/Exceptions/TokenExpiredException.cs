@@ -2,11 +2,11 @@
 
 namespace AspNetCore.Authentication.ReferenceToken.Exceptions
 {
-    public class ReferenceTokenExpiredException : Exception
+    public class TokenExpiredException : Exception
     {
         public DateTimeOffset ExpireAt { get; }
 
-        public ReferenceTokenExpiredException(DateTime expireAt)
+        public TokenExpiredException(DateTime expireAt)
         {
             ExpireAt = expireAt;
         }

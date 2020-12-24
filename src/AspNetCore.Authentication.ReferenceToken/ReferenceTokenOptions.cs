@@ -55,9 +55,9 @@ namespace AspNetCore.Authentication.ReferenceToken
         public TimeSpan RefreshTokenExpire { get; set; } = TimeSpan.FromHours(24);
 
         /// <summary>
-        /// If set up to false,Repeated creation of token (<see cref="ITokenOperator.CreateAsync"/>) will invalidate the old token
+        /// If set up to false,Repeated creation of token (<see cref="ITokenOperator.CreateAsync"/>) will invalidate the old token for one user.
         /// </summary>
-        public bool AllowMultiTokenActiveForOneUser { get; set; } = true;
+        public bool AllowMultiTokenActive { get; set; } = true;
 
         /// <summary>
         /// Use cache <see cref="ITokenCacheService"/>

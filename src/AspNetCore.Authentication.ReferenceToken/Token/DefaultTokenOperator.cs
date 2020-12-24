@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AspNetCore.Authentication.ReferenceToken.Abstractions;
 using Microsoft.Extensions.Options;
 
-namespace AspNetCore.Authentication.ReferenceToken.Abstractions
+namespace AspNetCore.Authentication.ReferenceToken
 {
     public class DefaultTokenOperator : ITokenOperator
     {
-        private readonly IOptionsMonitor<ReferenceTokenOptions> _options;
+        private readonly ReferenceTokenOptions _options;
         private readonly IProfileService _profileService;
         private readonly ITokenStore _tokenStore;
         private readonly ITokenCacheService _cacheService;
 
-        public DefaultTokenOperator(IOptionsMonitor<ReferenceTokenOptions> options,
+        public DefaultTokenOperator(IOptions<ReferenceTokenOptions> options,
             IProfileService profileService,
             ITokenStore tokenStore,
             ITokenCacheService cacheService)
         {
-            _options = options;
+            _options = options.Value;
             _profileService = profileService;
             _tokenStore = tokenStore;
             _cacheService = cacheService;
@@ -30,12 +31,12 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
             var claims = await _profileService.GetUserClaimsAsync(userId);
             var result = CreateByUserClaims(userId, claims);
 
-            if (!_options.CurrentValue.AllowMultiTokenActiveForOneUser)
+            if (!_options.AllowMultiTokenActive)
             {
                 const string reason = "Only one token active at the same time is allowed.";
 
                 //Remove old token from cache
-                if (_options.CurrentValue.UseCache)
+                if (_options.UseCache)
                 {
                     var tokenList = await _tokenStore.GetListAsync(userId);
                     foreach (var token in tokenList)
@@ -50,7 +51,7 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
 
             await _tokenStore.StoreAsync(new List<TokenModel>() {result.Token, result.Refresh});
 
-            if (_options.CurrentValue.UseCache)
+            if (_options.UseCache)
             {
                 await _cacheService.SetAsync(result.Token);
             }
@@ -68,7 +69,7 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
                 Type = TokenType.Reference,
                 UserId = userId,
                 Claims = claims,
-                Expiration = now + _options.CurrentValue.TokenExpire
+                Expiration = now + _options.TokenExpire
             };
 
             var refreshToken = new TokenModel()
@@ -78,7 +79,7 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
                 Type = TokenType.Refresh,
                 UserId = userId,
                 Claims = null,
-                Expiration = now + _options.CurrentValue.RefreshTokenExpire
+                Expiration = now + _options.RefreshTokenExpire
             };
 
             return TokenCreateResult.Success(token, refreshToken);
@@ -92,7 +93,7 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
                 return TokenCreateResult.Failed("invalid refresh_token");
             }
 
-            if (token.Expiration.UtcDateTime < DateTimeOffset.UtcNow)
+            if (token.CheckExpiration())
             {
                 return TokenCreateResult.Failed($"The refresh_token expired at '{token.Expiration.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'");
             }
@@ -102,7 +103,7 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
 
             await _tokenStore.StoreAsync(new List<TokenModel>() { result.Token, result.Refresh });
 
-            if (_options.CurrentValue.UseCache)
+            if (_options.UseCache)
             {
                 await _cacheService.SetAsync(result.Token);
             }
@@ -118,18 +119,13 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
                 return RefreshClaimsResult.Failed("invalid token");
             }
 
-            if (tokenModel.Expiration.UtcDateTime < DateTimeOffset.UtcNow)
-            {
-                return RefreshClaimsResult.Failed($"The token expired at '{tokenModel.Expiration.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'");
-            }
-
             var claims = await _profileService.GetUserClaimsAsync(tokenModel.UserId);
 
             //Refresh db
             await _tokenStore.UpdateClaimsAsync(token, claims);
 
             //Refresh cache
-            if (_options.CurrentValue.UseCache)
+            if (_options.UseCache)
             {
                 tokenModel.Claims = claims;
                 await _cacheService.SetAsync(tokenModel);
@@ -147,7 +143,7 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
             }
 
             //Remove from cache
-            if (_options.CurrentValue.UseCache)
+            if (_options.UseCache)
             {
                 await _cacheService.RemoveAsync(tokenModel, reason);
             }

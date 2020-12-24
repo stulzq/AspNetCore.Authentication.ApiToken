@@ -19,6 +19,11 @@ namespace AspNetCore.Authentication.ReferenceToken
         public DateTimeOffset CreateTime { get; set; }
         
         public DateTimeOffset Expiration { get; set; }
+
+        public bool CheckExpiration()
+        {
+            return Expiration.UtcDateTime < DateTimeOffset.UtcNow;
+        }
         
     }
 }

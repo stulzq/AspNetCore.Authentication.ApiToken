@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using AspNetCore.Authentication.ReferenceToken.Abstractions;
 
-namespace AspNetCore.Authentication.ReferenceToken.Abstractions
+namespace AspNetCore.Authentication.ReferenceToken
 {
     public class NullTokenCacheService:ITokenCacheService
     {

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using AspNetCore.Authentication.ApiToken;
+using AspNetCore.Authentication.ApiToken.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,9 +26,16 @@ namespace AspNetCore.ApiToken.SampleApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(ApiTokenDefaults.AuthenticationScheme)
-                .AddApiToken(op => op.ParseType = ApiTokenParseType.Both)
+                .AddApiToken(ApiTokenDefaults.AuthenticationScheme,null,op =>
+                {
+                    op.ParseType = ApiTokenParseType.QueryString;
+                    op.Challenge = "xxx";
+
+                })
                 .AddProfileService<MyApiTokenProfileService>()
                 .AddTokenStore<MyApiTokenStore>();
+                // .AddRedisCache(op=>op.ConnectionString="xxx");
+            
             services.AddControllers().AddNewtonsoftJson(op =>
             {
                 //…Ë÷√ ±«¯

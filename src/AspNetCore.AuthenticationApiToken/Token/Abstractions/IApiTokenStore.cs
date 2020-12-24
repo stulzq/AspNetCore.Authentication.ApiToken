@@ -13,7 +13,7 @@ namespace AspNetCore.Authentication.ApiToken.Abstractions
 
         Task<List<ApiTokenModel>> GetListAsync(string userId);
 
-        Task<ApiTokenModel> UpdateClaimsAsync(string token,Claim[] claims);
+        Task<ApiTokenModel> UpdateClaimsAsync(string token,IReadOnlyList<Claim> claims);
 
         Task<ApiTokenModel> RemoveAsync(string token);
 

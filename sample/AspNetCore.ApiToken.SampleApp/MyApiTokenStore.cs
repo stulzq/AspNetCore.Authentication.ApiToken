@@ -28,6 +28,7 @@ namespace AspNetCore.ApiToken.SampleApp
                     new Claim(ClaimTypes.NameIdentifier, "1"),
                     new Claim(ApiTokenClaimTypes.Subject, "1"),
                     new Claim(ApiTokenClaimTypes.Name,"张三"),
+                    new Claim(ApiTokenClaimTypes.Role,"Admin"),
                 },
                 CreateTime = DateTimeOffset.Now,
                 Expiration = DateTimeOffset.Now,
@@ -48,6 +49,7 @@ namespace AspNetCore.ApiToken.SampleApp
                         new Claim(ClaimTypes.NameIdentifier, "1"),
                         new Claim(ApiTokenClaimTypes.Subject, "1"),
                         new Claim(ApiTokenClaimTypes.Name,"张三"),
+                        new Claim(ApiTokenClaimTypes.Role,"Admin"),
                     },
                     CreateTime = DateTimeOffset.Now,
                     Expiration = DateTimeOffset.Now,
@@ -58,10 +60,11 @@ namespace AspNetCore.ApiToken.SampleApp
             });
         }
 
-        public Task<ApiTokenModel> UpdateClaimsAsync(string token, Claim[] claims)
+        public Task<ApiTokenModel> UpdateClaimsAsync(string token, IReadOnlyList<Claim> claims)
         {
             throw new NotImplementedException();
         }
+
 
         public Task<ApiTokenModel> RemoveAsync(string token)
         {

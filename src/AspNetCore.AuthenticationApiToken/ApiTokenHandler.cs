@@ -18,7 +18,6 @@ namespace AspNetCore.Authentication.ApiToken
     public class ApiTokenHandler : AuthenticationHandler<ApiTokenOptions>
     {
         private readonly IApiTokenValidator _tokenValidator;
-        private readonly ApiTokenOptions _options;
 
         /// <summary>
         /// Initializes a new instance of <see cref="ApiTokenHandler"/>.
@@ -32,7 +31,6 @@ namespace AspNetCore.Authentication.ApiToken
             IApiTokenValidator tokenValidator) : base(options, logger, encoder, clock)
         {
             _tokenValidator = tokenValidator;
-            _options = options.CurrentValue;
         }
 
         /// <summary>
@@ -50,7 +48,7 @@ namespace AspNetCore.Authentication.ApiToken
         protected virtual string ParseToken()
         {
             string token;
-            var type = _options.ParseType;
+            var type = Options.ParseType;
 
             var attr = Context.GetEndpoint()?.Metadata.GetMetadata<ApiTokenParseAttribute>();
             if (attr != null)
@@ -101,9 +99,9 @@ namespace AspNetCore.Authentication.ApiToken
 
         private string ParseTokenFromQueryString()
         {
-            if (Request.Query.ContainsKey(_options.QueryStringKey))
+            if (Request.Query.ContainsKey(Options.QueryStringKey))
             {
-                return Request.Query[_options.QueryStringKey];
+                return Request.Query[Options.QueryStringKey];
             }
 
             return null;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace AspNetCore.Authentication.ApiToken
@@ -14,7 +15,7 @@ namespace AspNetCore.Authentication.ApiToken
 
         public string UserId { get; set; }
 
-        public Claim[] Claims { get; set; }
+        public IReadOnlyList<Claim> Claims { get; set; }
 
         public DateTimeOffset CreateTime { get; set; }
 

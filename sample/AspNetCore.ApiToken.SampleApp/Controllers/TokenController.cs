@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using AspNetCore.Authentication.ApiToken;
 using AspNetCore.Authentication.ApiToken.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +22,7 @@ namespace AspNetCore.ApiToken.SampleApp.Controllers
             _tokenOperator = tokenOperator;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -28,7 +30,9 @@ namespace AspNetCore.ApiToken.SampleApp.Controllers
                 new
                 {
                     Token = await HttpContext.GetApiTokenAsync(),
-                    User= HttpContext.User.Claims
+                    Id = HttpContext.User.Claims.First(a => a.Type == ApiTokenClaimTypes.Subject).Value,
+                    Name = HttpContext.User.Claims.First(a => a.Type == ApiTokenClaimTypes.Name).Value,
+                    Role = HttpContext.User.Claims.First(a => a.Type == ApiTokenClaimTypes.Role).Value,
                 });
         }
 

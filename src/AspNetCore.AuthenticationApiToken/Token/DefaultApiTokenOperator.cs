@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiToken.Abstractions;
@@ -28,7 +29,9 @@ namespace AspNetCore.Authentication.ApiToken
 
         public virtual async Task<ApiTokenCreateResult> CreateAsync(string userId)
         {
-            var claims = await _profileService.GetUserClaimsAsync(userId);
+
+            var claims = await GetUserClaimsAsync(userId);
+
             var result = CreateByUserClaims(userId, claims);
 
             await RemoveOldTokenAsync(userId);
@@ -43,7 +46,7 @@ namespace AspNetCore.Authentication.ApiToken
             return result;
         }
 
-        private ApiTokenCreateResult CreateByUserClaims(string userId, Claim[] claims)
+        private ApiTokenCreateResult CreateByUserClaims(string userId, List<Claim> claims)
         {
             var now = DateTime.Now;
             var token = new ApiTokenModel()
@@ -103,7 +106,7 @@ namespace AspNetCore.Authentication.ApiToken
                 return ApiTokenCreateResult.Failed($"The refresh_token expired at '{token.Expiration.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'");
             }
 
-            var claims = await _profileService.GetUserClaimsAsync(token.UserId);
+            var claims = await GetUserClaimsAsync(token.UserId);
             var result = CreateByUserClaims(token.UserId, claims);
 
             await RemoveOldTokenAsync(token.UserId);
@@ -126,7 +129,7 @@ namespace AspNetCore.Authentication.ApiToken
                 return RefreshClaimsResult.Failed("invalid token");
             }
 
-            var claims = await _profileService.GetUserClaimsAsync(tokenModel.UserId);
+            var claims = await GetUserClaimsAsync(tokenModel.UserId);
 
             //Refresh db
             await _tokenStore.UpdateClaimsAsync(token, claims);
@@ -157,6 +160,17 @@ namespace AspNetCore.Authentication.ApiToken
 
             //Remove from db
             await _tokenStore.RemoveAsync(token);
+        }
+
+        private async Task<List<Claim>> GetUserClaimsAsync(string userId)
+        {
+            var claims = await _profileService.GetUserClaimsAsync(userId);
+            if (claims.All(a => a.Type != ApiTokenClaimTypes.Subject))
+            {
+                claims.Add(new Claim(ApiTokenClaimTypes.Subject, userId));
+            }
+
+            return claims;
         }
     }
 }

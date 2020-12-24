@@ -71,7 +71,8 @@ namespace AspNetCore.Authentication.ApiToken
             var claims = tokenModel.Claims;
 
             var result = new ClaimsPrincipal();
-            result.AddIdentity(new ClaimsIdentity(claims, schemeName));
+            result.AddIdentity(new ClaimsIdentity(claims, schemeName, _options.NameClaimType, _options.RoleClaimType));
+            
             return result;
         }
     }

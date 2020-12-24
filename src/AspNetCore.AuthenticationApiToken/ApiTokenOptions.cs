@@ -57,7 +57,7 @@ namespace AspNetCore.Authentication.ApiToken
         public TimeSpan RefreshTokenExpire { get; set; } = TimeSpan.FromHours(24);
 
         /// <summary>
-        /// If set up to false,Repeated creation of token (<see cref="IApiTokenValidator.CreateAsync"/>) will invalidate the old token for one user.
+        /// If set up to false,Repeated creation of token (<see cref="IApiTokenOperator.CreateAsync"/>) will invalidate the old token for one user.
         /// </summary>
         public bool AllowMultiTokenActive { get; set; } = true;
 
@@ -71,6 +71,9 @@ namespace AspNetCore.Authentication.ApiToken
         /// Use cache <see cref="IApiTokenCacheService"/>
         /// </summary>
         public bool UseCache { get; set; } = false;
+
+        public string RoleClaimType { get; set; } = ApiTokenClaimTypes.Role;
+        public string NameClaimType { get; set; } = ApiTokenClaimTypes.Name;
 
     }
 }

@@ -80,7 +80,7 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             }
         }
 
-        private byte[] Serialize(ApiTokenCache data)
+        private static byte[] Serialize(ApiTokenCache data)
         {
             return MessagePackSerializer.Serialize(data, ContractlessStandardResolver.Options);
         }

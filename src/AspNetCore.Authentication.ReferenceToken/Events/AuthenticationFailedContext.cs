@@ -23,6 +23,5 @@ namespace AspNetCore.Authentication.ReferenceToken.Events
         /// Gets or sets the exception associated with the authentication failure.
         /// </summary>
         public Exception Exception { get; set; }
-        public new AuthenticateResult Result { get; set; }
     }
 }

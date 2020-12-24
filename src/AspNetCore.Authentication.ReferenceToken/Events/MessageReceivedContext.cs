@@ -23,6 +23,5 @@ namespace AspNetCore.Authentication.ReferenceToken.Events
         /// </summary>
         public string Token { get; set; }
 
-        public new AuthenticateResult Result { get; set; }
     }
 }

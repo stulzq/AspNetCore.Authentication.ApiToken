@@ -10,6 +10,8 @@
     <PackageProjectUrl>https://github.com/stulzq/AspNetCore.Authentication.ApiToken</PackageProjectUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageTags>aspnetcore,authentication,apitoken</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <PropertyGroup Label="Document">

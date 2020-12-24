@@ -38,10 +38,8 @@ namespace AspNetCore.ApiToken.SampleApp
             
             services.AddControllers().AddNewtonsoftJson(op =>
             {
-                //设置时区
                 op.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
                 op.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm";
-                //序列化采用驼峰命名
                 op.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
 

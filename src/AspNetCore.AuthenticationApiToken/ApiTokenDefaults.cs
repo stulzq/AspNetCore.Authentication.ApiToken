@@ -16,5 +16,7 @@
         /// Get token from request querystring key, eg. https://www.google.com/api/apple?token=xxxx
         /// </summary>
         public const string TokenParseQueryStringKey = "Token";
+        
+        public const string ApiTokenName = "api_token";
     }
 }

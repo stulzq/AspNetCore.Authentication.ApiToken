@@ -183,6 +183,11 @@ namespace AspNetCore.Authentication.ApiToken
                     return tokenValidatedContext.Result;
                 }
 
+                tokenValidatedContext.Properties.StoreTokens(new[]
+                {
+                    new AuthenticationToken { Name = ApiTokenDefaults.ApiTokenName, Value = token }
+                });
+                
                 tokenValidatedContext.Success();
                 return tokenValidatedContext.Result;
             }

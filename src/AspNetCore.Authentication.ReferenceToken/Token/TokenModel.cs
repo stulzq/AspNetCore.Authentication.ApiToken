@@ -8,17 +8,17 @@ namespace AspNetCore.Authentication.ReferenceToken
         public string Token { get; set; }
 
         /// <summary>
-        /// reference or refresh
+        /// reference or refresh <see cref="TokenType"/>
         /// </summary>
-        public string Type { get; set; }
+        public TokenType Type { get; set; }
 
         public string UserId { get; set; }
 
         public Claim[] Claims { get; set; }
 
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
         
-        public DateTime Expiration { get; set; }
+        public DateTimeOffset Expiration { get; set; }
         
     }
 }

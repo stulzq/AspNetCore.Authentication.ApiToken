@@ -1,9 +1,10 @@
 ﻿using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace AspNetCore.Authentication.ReferenceToken.Abstractions
 {
     public interface IProfileService
     {
-        Claim[] GetUserClaims();
+        Task<Claim[]> GetUserClaimsAsync(string userId);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
 using System.Text;
@@ -145,7 +144,7 @@ namespace AspNetCore.Authentication.ReferenceToken
                 ClaimsPrincipal principal = null;
                 try
                 {
-                    principal = _tokenValidator.ValidateToken(token);
+                    principal = await _tokenValidator.ValidateTokenAsync(token);
                 }
                 catch (Exception ex)
                 {
@@ -292,7 +291,7 @@ namespace AspNetCore.Authentication.ReferenceToken
             string message = authFailure switch
             {
                 ReferenceTokenExpiredException rte =>
-                    $"The token expired at '{rte.ExpireAt.ToString(CultureInfo.InvariantCulture)}'",
+                    $"The token expired at '{rte.ExpireAt.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'",
                 _ => authFailure.Message
             };
 

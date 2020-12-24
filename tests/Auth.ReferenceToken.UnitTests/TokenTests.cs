@@ -16,7 +16,7 @@ namespace Auth.ReferenceToken.UnitTests
         [Fact]
         public void CreateToken()
         {
-            var token = TokenTools.CreateReferenceToken("1");
+            var token = TokenTools.CreateToken("1");
             _outputHelper.WriteLine(token);
         }
     }

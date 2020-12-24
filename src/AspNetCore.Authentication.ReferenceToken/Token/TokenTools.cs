@@ -13,15 +13,15 @@ namespace AspNetCore.Authentication.ReferenceToken
     /// </summary>
     public class TokenTools
     {
-        public static string CreateReferenceToken(string userId)
+        public static string CreateToken(string userId)
         {
             var bytes = new Span<byte>(new byte[8]);
             var random = new Random(DateTime.Now.Millisecond);
             random.NextBytes(bytes);
-            return CreateReferenceToken(userId, DateTime.Now, bytes);
+            return CreateToken(userId, DateTime.Now, bytes);
         }
 
-        public static string CreateReferenceToken(string userId, DateTimeOffset now, Span<byte> randBytes)
+        public static string CreateToken(string userId, DateTimeOffset now, Span<byte> randBytes)
         {
             var data = Encoding.UTF8.GetBytes($"{userId}{now.ToUnixTimeMilliseconds()}").AsSpan();
             var resultBytes = new Span<byte>(new byte[data.Length + randBytes.Length]);

@@ -1,4 +1,5 @@
 ﻿using System;
+using AspNetCore.Authentication.ReferenceToken.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 
 namespace AspNetCore.Authentication.ReferenceToken
@@ -43,8 +44,25 @@ namespace AspNetCore.Authentication.ReferenceToken
             set => base.Events = value;
         }
 
+        /// <summary>
+        /// Reference token expire time. Default: 1 hour.
+        /// </summary>
         public TimeSpan TokenExpire { get; set; } = TimeSpan.FromHours(1);
-        
+
+        /// <summary>
+        /// Refresh token expire time. Default: 24 hour.
+        /// </summary>
         public TimeSpan RefreshTokenExpire { get; set; } = TimeSpan.FromHours(24);
+
+        /// <summary>
+        /// If set up to false,Repeated creation of token (<see cref="ITokenOperator.CreateAsync"/>) will invalidate the old token
+        /// </summary>
+        public bool AllowMultiTokenActiveForOneUser { get; set; } = true;
+
+        /// <summary>
+        /// Use cache <see cref="ITokenCacheService"/>
+        /// </summary>
+        public bool UseCache { get; set; } = false;
+
     }
 }

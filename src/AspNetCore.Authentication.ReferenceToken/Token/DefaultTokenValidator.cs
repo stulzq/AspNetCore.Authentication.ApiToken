@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ReferenceToken.Abstractions;
+using AspNetCore.Authentication.ReferenceToken.Events;
 using AspNetCore.Authentication.ReferenceToken.Exceptions;
 using Microsoft.Extensions.Options;
 
@@ -43,6 +44,8 @@ namespace AspNetCore.Authentication.ReferenceToken
             if (tokenModel == null)
             {
                 tokenModel = await _store.GetAsync(token);
+
+                //set cache
                 if (tokenModel != null && _options.UseCache)
                 {
                     await _cacheService.SetAsync(tokenModel);

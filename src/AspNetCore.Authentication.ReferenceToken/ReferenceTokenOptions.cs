@@ -60,6 +60,11 @@ namespace AspNetCore.Authentication.ReferenceToken
         public bool AllowMultiTokenActive { get; set; } = true;
 
         /// <summary>
+        /// Unit: sec.
+        /// </summary>
+        public int ExpiredTokenCleanInterval { get; set; } = 86400;
+
+        /// <summary>
         /// Use cache <see cref="ITokenCacheService"/>
         /// </summary>
         public bool UseCache { get; set; } = false;

@@ -59,5 +59,6 @@ namespace AspNetCore.Authentication.ReferenceToken
         /// Invoked when a protocol message is first received.
         /// </summary>
         public virtual Task MessageReceived(MessageReceivedContext context) => OnMessageReceived(context);
+
     }
 }

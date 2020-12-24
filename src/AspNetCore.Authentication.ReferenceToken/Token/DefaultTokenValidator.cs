@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ReferenceToken.Abstractions;
@@ -53,6 +51,11 @@ namespace AspNetCore.Authentication.ReferenceToken
 
             if (tokenModel == null)
             {
+                if (_options.UseCache)
+                {
+                    await _cacheService.SetNullAsync(token);
+                }
+
                 throw new TokenInvalidException("invalid token");
             }
 

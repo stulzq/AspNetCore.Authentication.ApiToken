@@ -8,6 +8,8 @@ namespace AspNetCore.Authentication.ReferenceToken.Abstractions
 
         Task SetAsync(TokenModel token);
 
+        Task SetNullAsync(string invalidToken);
+
         Task RemoveAsync(TokenModel token,string reason=null);
     }
 }

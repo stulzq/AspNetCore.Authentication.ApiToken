@@ -18,5 +18,7 @@ namespace AspNetCore.Authentication.ReferenceToken.Events
             ReferenceTokenOptions options)
             : base(context, scheme, options) { }
 
+        public string Token { get; set; }
+
     }
 }

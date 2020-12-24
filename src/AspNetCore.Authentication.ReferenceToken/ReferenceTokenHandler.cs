@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AspNetCore.Authentication.ReferenceToken.Abstractions;
 using AspNetCore.Authentication.ReferenceToken.Events;
 using AspNetCore.Authentication.ReferenceToken.Exceptions;
 using Microsoft.AspNetCore.Authentication;
@@ -16,6 +18,7 @@ namespace AspNetCore.Authentication.ReferenceToken
 {
     public class ReferenceTokenHandler: AuthenticationHandler<ReferenceTokenOptions>
     {
+        private readonly ITokenValidator _tokenValidator;
         private readonly ReferenceTokenOptions _options;
 
         /// <summary>
@@ -26,8 +29,10 @@ namespace AspNetCore.Authentication.ReferenceToken
             IOptionsMonitor<ReferenceTokenOptions> options, 
             ILoggerFactory logger,
             UrlEncoder encoder, 
-            ISystemClock clock) : base(options, logger, encoder, clock)
+            ISystemClock clock,
+            ITokenValidator tokenValidator) : base(options, logger, encoder, clock)
         {
+            _tokenValidator = tokenValidator;
             _options = options.CurrentValue;
         }
 
@@ -136,29 +141,51 @@ namespace AspNetCore.Authentication.ReferenceToken
                     return AuthenticateResult.NoResult();
                 }
 
-                //List<Exception> validationFailures = null;
+                Exception validationFailure = null;
+                ClaimsPrincipal principal = null;
+                try
+                {
+                    principal = _tokenValidator.ValidateToken(token);
+                }
+                catch (Exception ex)
+                {
+                    Logger.TokenValidationFailed(ex);
 
-                //TODO 验证Token https://github.com/dotnet/aspnetcore/blob/71a046bd88f9ce469e76ddea492de02bfae79252/src/Security/Authentication/JwtBearer/src/JwtBearerHandler.cs
+                    validationFailure = ex;
+                }
 
+                if (validationFailure != null)
+                {
+                    var authenticationFailedContext = new AuthenticationFailedContext(Context, Scheme, Options)
+                    {
+                        Exception = validationFailure
+                    };
+                
+                    await Events.AuthenticationFailed(authenticationFailedContext);
+                    
+                    if (authenticationFailedContext.Result!=null)
+                    {
+                        return authenticationFailedContext.Result;
+                    }
+                    
+                    return AuthenticateResult.Fail(authenticationFailedContext.Exception);
+                }
 
-                // if (validationFailures != null)
-                // {
-                //     var authenticationFailedContext = new AuthenticationFailedContext(Context, Scheme, Options)
-                //     {
-                //         Exception = (validationFailures.Count == 1) ? validationFailures[0] : new AggregateException(validationFailures)
-                //     };
-                //
-                //     await Events.AuthenticationFailed(authenticationFailedContext);
-                //     
-                //     if (authenticationFailedContext.Result!=null)
-                //     {
-                //         return authenticationFailedContext.Result;
-                //     }
-                //     
-                //     return AuthenticateResult.Fail(authenticationFailedContext.Exception);
-                // }
+                Logger.TokenValidationSucceeded();
+                var tokenValidatedContext = new TokenValidatedContext(Context, Scheme, Options)
+                {
+                    Principal = principal,
+                    Token = token
+                };
 
-                return AuthenticateResult.Fail("No TokenValidator available for token: " + token );
+                await Events.TokenValidated(tokenValidatedContext);
+                if (tokenValidatedContext.Result != null)
+                {
+                    return tokenValidatedContext.Result;
+                }
+
+                tokenValidatedContext.Success();
+                return tokenValidatedContext.Result;
             }
             catch (Exception ex)
             {
@@ -185,7 +212,7 @@ namespace AspNetCore.Authentication.ReferenceToken
             var authResult = await HandleAuthenticateOnceSafeAsync();
             var eventContext = new ReferenceTokenChallengeContext(Context, Scheme, Options, properties)
             {
-                AuthenticateFailure = authResult.Failure
+                AuthenticateFailure = authResult?.Failure
             };
 
             // Avoid returning error=invalid_token if the error is not caused by an authentication failure (e.g missing token).
@@ -262,31 +289,14 @@ namespace AspNetCore.Authentication.ReferenceToken
 
         private static string CreateErrorDescription(Exception authFailure)
         {
-            IReadOnlyCollection<Exception> exceptions;
-            if (authFailure is AggregateException agEx)
+            string message = authFailure switch
             {
-                exceptions = agEx.InnerExceptions;
-            }
-            else
-            {
-                exceptions = new[] { authFailure };
-            }
+                ReferenceTokenExpiredException rte =>
+                    $"The token expired at '{rte.ExpireAt.ToString(CultureInfo.InvariantCulture)}'",
+                _ => authFailure.Message
+            };
 
-            var messages = new List<string>(exceptions.Count);
-
-            foreach (var ex in exceptions)
-            {
-                // Order sensitive, some of these exceptions derive from others
-                // and we want to display the most specific message possible.
-                switch (ex)
-                {
-                    case ReferenceTokenExpiredException ste:
-                        messages.Add($"The token expired at '{ste.ExpireAt.ToString(CultureInfo.InvariantCulture)}'");
-                        break;
-                }
-            }
-
-            return string.Join("; ", messages);
+            return message;
         }
 
         

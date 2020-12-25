@@ -3,26 +3,31 @@ using AspNetCore.Authentication.ApiToken.Abstractions;
 
 namespace AspNetCore.Authentication.ApiToken
 {
-    public class NullApiTokenCacheService:IApiTokenCacheService
+    public class NullApiTokenCacheService : IApiTokenCacheService
     {
         public Task<ApiTokenCache> GetAsync(string token)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult(default(ApiTokenCache));
         }
 
         public Task SetAsync(TokenModel token)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task SetNullAsync(string invalidToken)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task RemoveAsync(string token, string reason = null)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
+        }
+
+        public Task InitializeAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }

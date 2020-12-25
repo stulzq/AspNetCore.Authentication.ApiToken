@@ -15,7 +15,7 @@ namespace AspNetCore.Authentication.ApiToken.Redis
         public RedisTokenCacheService(IOptions<RedisTokenCacheOptions> options)
         {
             _options = options.Value;
-            _tokenCacheKeyPrefix = _options.CachePrefix + "token:{0}";
+            _tokenCacheKeyPrefix = _options.CachePrefix + ":token:{0}";
         }
 
         public async Task InitializeAsync()
@@ -23,7 +23,6 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             var connection = await ConnectionMultiplexer.ConnectAsync(_options.ConnectionString);
             _cache = connection.GetDatabase();
         }
-
 
         public async Task<ApiTokenCache> GetAsync(string token)
         {

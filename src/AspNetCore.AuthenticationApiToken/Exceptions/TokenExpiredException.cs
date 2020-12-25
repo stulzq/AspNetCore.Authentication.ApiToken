@@ -6,10 +6,12 @@ namespace AspNetCore.Authentication.ApiToken.Exceptions
     {
         public DateTimeOffset ExpireAt { get; }
 
-        public TokenExpiredException(DateTime expireAt)
+        public TokenExpiredException(string message, DateTime expireAt) : base(message)
         {
             ExpireAt = expireAt;
         }
+
+
 
     }
 }

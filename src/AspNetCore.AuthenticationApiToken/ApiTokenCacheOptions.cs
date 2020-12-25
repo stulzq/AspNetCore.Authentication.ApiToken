@@ -19,7 +19,7 @@ namespace AspNetCore.Authentication.ApiToken
         /// <summary>
         /// Cache key prefix in redis.
         /// </summary>
-        public string CachePrefix { get; set; } = "aspnetcore:auth:ref:{0}";
+        public string CachePrefix { get; set; } = "aspnetcore:authentication";
 
         /// <summary>
         /// The invalid token will be remove immediately by the token store,

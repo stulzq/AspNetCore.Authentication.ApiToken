@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using AspNetCore.Authentication.ApiToken;
-using AspNetCore.Authentication.ApiToken.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

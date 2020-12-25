@@ -142,12 +142,11 @@ namespace AspNetCore.Authentication.ApiToken
                 ClaimsPrincipal principal = null;
                 try
                 {
-                    principal = await _tokenValidator.ValidateTokenAsync(token, Scheme.Name);
+                    principal = await _tokenValidator.ValidateTokenAsync(Options, token, Scheme.Name);
                 }
                 catch (Exception ex)
                 {
                     Logger.TokenValidationFailed(ex);
-
                     validationFailure = ex;
                 }
 
@@ -295,7 +294,7 @@ namespace AspNetCore.Authentication.ApiToken
             {
                 TokenExpiredException ee =>
                     $"The token expired at '{ee.ExpireAt.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'",
-                TokenInvalidException ue => string.IsNullOrEmpty(ue.Message) ? "invalid_token" : ue.Message,
+                TokenInvalidException ue => ue.Message,
                 _ => authFailure.Message
             };
 

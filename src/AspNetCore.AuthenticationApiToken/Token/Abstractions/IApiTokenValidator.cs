@@ -5,6 +5,6 @@ namespace AspNetCore.Authentication.ApiToken.Abstractions
 {
     public interface IApiTokenValidator
     {
-        Task<ClaimsPrincipal> ValidateTokenAsync(string token, string schemeName);
+        Task<ClaimsPrincipal> ValidateTokenAsync(ApiTokenOptions options, string token, string schemeName);
     }
 }

@@ -3,28 +3,26 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiToken.Abstractions;
 using AspNetCore.Authentication.ApiToken.Exceptions;
-using Microsoft.Extensions.Options;
 
 namespace AspNetCore.Authentication.ApiToken
 {
     public class DefaultApiTokenValidator : IApiTokenValidator
     {
-        private readonly ApiTokenOptions _options;
         private readonly IApiTokenStore _store;
         private readonly IApiTokenCacheService _cacheService;
 
-        public DefaultApiTokenValidator(IOptions<ApiTokenOptions> options, IApiTokenStore store, IApiTokenCacheService cacheService)
+        public DefaultApiTokenValidator(IApiTokenStore store, IApiTokenCacheService cacheService)
         {
-            _options = options.Value;
             _store = store;
             _cacheService = cacheService;
         }
-        public virtual async Task<ClaimsPrincipal> ValidateTokenAsync([NotNull] string token, string schemeName)
+
+        public virtual async Task<ClaimsPrincipal> ValidateTokenAsync(ApiTokenOptions options, [NotNull] string token, string schemeName)
         {
             TokenModel tokenModel = null;
 
             //Get from cache
-            if (_options.UseCache)
+            if (options.UseCache)
             {
                 var tokenCache = await _cacheService.GetAsync(token);
 
@@ -34,7 +32,7 @@ namespace AspNetCore.Authentication.ApiToken
                     {
                         if (tokenCache.Reason == ApiTokenGlobalSettings.Reason.NotAllowMultiTokenActive)
                         {
-                            throw new TokenMultiActiveException();
+                            throw new TokenMultiActiveException(tokenCache.Reason);
                         }
 
                         throw new TokenInvalidException(tokenCache.Reason);
@@ -50,7 +48,7 @@ namespace AspNetCore.Authentication.ApiToken
                 tokenModel = await _store.GetAsync(token);
 
                 //set cache
-                if (tokenModel != null && _options.UseCache)
+                if (tokenModel != null && options.UseCache)
                 {
                     await _cacheService.SetAsync(tokenModel);
                 }
@@ -58,7 +56,7 @@ namespace AspNetCore.Authentication.ApiToken
 
             if (tokenModel == null)
             {
-                if (_options.UseCache)
+                if (options.UseCache)
                 {
                     await _cacheService.SetNullAsync(token);
                 }
@@ -69,15 +67,15 @@ namespace AspNetCore.Authentication.ApiToken
             //Check expiration
             if (!tokenModel.IsValid)
             {
-                throw new TokenExpiredException(tokenModel.Expiration.DateTime);
+                throw new TokenExpiredException("Token expired at " + tokenModel.Expiration, tokenModel.Expiration.DateTime);
             }
 
             //Generate ClaimsPrincipal
             var claims = tokenModel.Claims;
 
             var result = new ClaimsPrincipal();
-            result.AddIdentity(new ClaimsIdentity(claims, schemeName, _options.NameClaimType, _options.RoleClaimType));
-            
+            result.AddIdentity(new ClaimsIdentity(claims, schemeName, options.NameClaimType, options.RoleClaimType));
+
             return result;
         }
     }

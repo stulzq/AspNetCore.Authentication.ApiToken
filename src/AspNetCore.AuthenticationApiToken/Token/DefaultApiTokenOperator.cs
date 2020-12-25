@@ -5,33 +5,60 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiToken.Abstractions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
 namespace AspNetCore.Authentication.ApiToken
 {
     public class DefaultApiTokenOperator : IApiTokenOperator
     {
-        private readonly ApiTokenOptions _options;
+        private readonly IOptionsMonitor<ApiTokenOptions> _optionsMonitor;
         private readonly IApiTokenProfileService _profileService;
         private readonly IApiTokenStore _tokenStore;
         private readonly IApiTokenCacheService _cacheService;
+        private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
 
-        public DefaultApiTokenOperator(IOptions<ApiTokenOptions> options,
+        private ApiTokenOptions _options;
+        private string _innerScheme;
+
+        public DefaultApiTokenOperator(
+            IOptionsMonitor<ApiTokenOptions> optionsMonitor,
             IApiTokenProfileService profileService,
             IApiTokenStore tokenStore,
-            IApiTokenCacheService cacheService)
+            IApiTokenCacheService cacheService,
+            IAuthenticationSchemeProvider authenticationSchemeProvider)
         {
-            _options = options.Value;
+            _optionsMonitor = optionsMonitor;
             _profileService = profileService;
             _tokenStore = tokenStore;
             _cacheService = cacheService;
+            _authenticationSchemeProvider = authenticationSchemeProvider;
         }
 
-        public virtual async Task<TokenCreateResult> CreateAsync(string userId)
+        private async Task InitializeAsync(string scheme)
         {
+            if (string.IsNullOrEmpty(scheme))
+            {
+                var defaultScheme = await _authenticationSchemeProvider.GetDefaultAuthenticateSchemeAsync();
+                if (defaultScheme != null && defaultScheme.HandlerType == typeof(ApiTokenHandler))
+                {
+                    _innerScheme = defaultScheme.Name;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Default authenticate scheme type is not {typeof(ApiTokenHandler).FullName}, you must be to set scheme.");
+                }
+            }
+
+            _options = _optionsMonitor.Get(_innerScheme);
+        }
+
+        public virtual async Task<TokenCreateResult> CreateAsync(string userId, string scheme = null)
+        {
+            await InitializeAsync(scheme);
             var claims = await GetUserClaimsAsync(userId);
 
-            var result = CreateByUserClaims(userId, claims);
+            var result = CreateToken(userId, claims, _innerScheme);
 
             await RemoveOldTokenAsync(userId);
 
@@ -45,8 +72,9 @@ namespace AspNetCore.Authentication.ApiToken
             return result;
         }
 
-        private TokenCreateResult CreateByUserClaims(string userId, List<Claim> claims)
+        private TokenCreateResult CreateToken(string userId, List<Claim> claims, string scheme)
         {
+            userId = $"{userId}{scheme}";
             var now = DateTime.Now;
             var token = new TokenModel()
             {
@@ -90,8 +118,9 @@ namespace AspNetCore.Authentication.ApiToken
             }
         }
 
-        public virtual async Task<TokenCreateResult> RefreshAsync(string refreshToken)
+        public virtual async Task<TokenCreateResult> RefreshAsync(string refreshToken, string scheme = null)
         {
+            await InitializeAsync(scheme);
             var token = await _tokenStore.GetAsync(refreshToken);
             if (token == null || token.Type != TokenType.Refresh)
             {
@@ -104,7 +133,7 @@ namespace AspNetCore.Authentication.ApiToken
             }
 
             var claims = await GetUserClaimsAsync(token.UserId);
-            var result = CreateByUserClaims(token.UserId, claims);
+            var result = CreateToken(token.UserId, claims, _innerScheme);
 
             await RemoveOldTokenAsync(token.UserId);
             await _tokenStore.RemoveAsync(refreshToken);
@@ -119,8 +148,9 @@ namespace AspNetCore.Authentication.ApiToken
             return result;
         }
 
-        public virtual async Task<RefreshClaimsResult> RefreshClaimsAsync(string token)
+        public virtual async Task<RefreshClaimsResult> RefreshClaimsAsync(string token, string scheme = null)
         {
+            await InitializeAsync(scheme);
             var tokenModel = await _tokenStore.GetAsync(token);
             if (tokenModel == null || tokenModel.Type != TokenType.Bearer)
             {
@@ -142,8 +172,9 @@ namespace AspNetCore.Authentication.ApiToken
             return RefreshClaimsResult.Success();
         }
 
-        public virtual async Task RemoveAsync(string token, string reason = null)
+        public virtual async Task RemoveAsync(string token, string reason = null, string scheme = null)
         {
+            await InitializeAsync(scheme);
             var tokenModel = await _tokenStore.GetAsync(token);
             if (tokenModel == null)
             {

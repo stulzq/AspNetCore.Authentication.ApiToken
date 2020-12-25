@@ -19,6 +19,6 @@ namespace AspNetCore.Authentication.ApiToken.Abstractions
 
         Task<TokenModel> RemoveListAsync(string userId);
 
-        Task RemoveExpirationAsync();
+        Task<int> RemoveExpirationAsync();
     }
 }

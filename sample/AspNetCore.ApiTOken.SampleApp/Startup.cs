@@ -25,12 +25,13 @@ namespace AspNetCore.ApiToken.SampleApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(ApiTokenDefaults.AuthenticationScheme)
-                .AddApiToken(ApiTokenDefaults.AuthenticationScheme,null,op =>
+                .AddApiToken(ApiTokenDefaults.AuthenticationScheme, null, op =>
                 {
                     op.ParseType = ApiTokenParseType.QueryString;
                     op.Challenge = "xxx";
 
                 })
+                .AddCleanService()
                 .AddProfileService<MyApiTokenProfileService>()
                 .AddTokenStore<MyApiTokenStore>();
                 // .AddRedisCache(op=>op.ConnectionString="xxx");

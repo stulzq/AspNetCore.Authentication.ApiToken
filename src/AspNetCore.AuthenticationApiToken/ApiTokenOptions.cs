@@ -60,13 +60,6 @@ namespace AspNetCore.Authentication.ApiToken
         public bool AllowMultiTokenActive { get; set; } = true;
 
         /// <summary>
-        /// Background Service periodically run clean stored expired token, will call <see cref="IApiTokenStore.RemoveExpirationAsync"/>. Unit: second.
-        /// <para></para>
-        /// * If set value to 0, the service will not start.
-        /// </summary>
-        public int ExpiredTokenCleanInterval { get; set; } = 86400;
-
-        /// <summary>
         /// Use caching to improve performance, the cache service implementation interface <see cref="IApiTokenCacheService"/>.
         /// </summary>
         public bool UseCache { get; set; } = false;

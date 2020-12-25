@@ -31,7 +31,7 @@ namespace AspNetCore.ApiToken.SampleApp
                     new Claim(ApiTokenClaimTypes.Role,"Admin"),
                 },
                 CreateTime = DateTimeOffset.Now,
-                Expiration = DateTimeOffset.Now,
+                Expiration = DateTimeOffset.Now.AddHours(1),
                 Value = "A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A91257",
                 Type = TokenType.Bearer,
                 UserId = "1"
@@ -76,9 +76,9 @@ namespace AspNetCore.ApiToken.SampleApp
             throw new NotImplementedException();
         }
 
-        public Task RemoveExpirationAsync()
+        public Task<int> RemoveExpirationAsync()
         {
-            throw new NotImplementedException();
+            return Task.FromResult(0);
         }
     }
 }

@@ -8,4 +8,3 @@ TODO:
 - [ ] Token Clean Service
 - [ ] Code annotation
 - [ ] Document
-- [ ] Create ITokenParser

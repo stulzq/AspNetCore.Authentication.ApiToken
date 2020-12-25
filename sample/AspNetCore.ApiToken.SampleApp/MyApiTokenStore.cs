@@ -60,18 +60,18 @@ namespace AspNetCore.ApiToken.SampleApp
             });
         }
 
-        public Task<TokenModel> UpdateClaimsAsync(string token, IReadOnlyList<Claim> claims)
+        public Task UpdateClaimsAsync(string token, IReadOnlyList<Claim> claims)
         {
             throw new NotImplementedException();
         }
 
 
-        public Task<TokenModel> RemoveAsync(string token)
+        public Task RemoveAsync(string token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TokenModel> RemoveListAsync(string userId)
+        public Task RemoveListAsync(string userId)
         {
             throw new NotImplementedException();
         }

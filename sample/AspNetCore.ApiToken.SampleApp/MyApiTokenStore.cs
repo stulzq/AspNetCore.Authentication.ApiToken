@@ -9,19 +9,19 @@ namespace AspNetCore.ApiToken.SampleApp
 {
     public class MyApiTokenStore : IApiTokenStore
     {
-        public Task StoreAsync(ApiTokenModel token)
+        public Task StoreAsync(TokenModel token)
         {
             return Task.CompletedTask;
         }
 
-        public Task StoreAsync(List<ApiTokenModel> token)
+        public Task StoreAsync(List<TokenModel> token)
         {
             return Task.CompletedTask;
         }
 
-        public Task<ApiTokenModel> GetAsync(string token)
+        public Task<TokenModel> GetAsync(string token)
         {
-            return Task.FromResult(new ApiTokenModel()
+            return Task.FromResult(new TokenModel()
             {
                 Claims = new Claim[]
                 {
@@ -32,17 +32,17 @@ namespace AspNetCore.ApiToken.SampleApp
                 },
                 CreateTime = DateTimeOffset.Now,
                 Expiration = DateTimeOffset.Now,
-                Token = "A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A91257",
-                Type = ApiTokenType.ApiToken,
+                Value = "A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A91257",
+                Type = TokenType.Bearer,
                 UserId = "1"
             });
         }
 
-        public Task<List<ApiTokenModel>> GetListAsync(string userId)
+        public Task<List<TokenModel>> GetListAsync(string userId)
         {
-            return Task.FromResult(new List<ApiTokenModel>()
+            return Task.FromResult(new List<TokenModel>()
             {
-                new ApiTokenModel()
+                new TokenModel()
                 {
                     Claims = new Claim[]
                     {
@@ -53,25 +53,25 @@ namespace AspNetCore.ApiToken.SampleApp
                     },
                     CreateTime = DateTimeOffset.Now,
                     Expiration = DateTimeOffset.Now,
-                    Token = "A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A91257",
-                    Type = ApiTokenType.ApiToken,
+                    Value = "A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A91257",
+                    Type = TokenType.Bearer,
                     UserId = "1"
                 }
             });
         }
 
-        public Task<ApiTokenModel> UpdateClaimsAsync(string token, IReadOnlyList<Claim> claims)
+        public Task<TokenModel> UpdateClaimsAsync(string token, IReadOnlyList<Claim> claims)
         {
             throw new NotImplementedException();
         }
 
 
-        public Task<ApiTokenModel> RemoveAsync(string token)
+        public Task<TokenModel> RemoveAsync(string token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ApiTokenModel> RemoveListAsync(string userId)
+        public Task<TokenModel> RemoveListAsync(string userId)
         {
             throw new NotImplementedException();
         }

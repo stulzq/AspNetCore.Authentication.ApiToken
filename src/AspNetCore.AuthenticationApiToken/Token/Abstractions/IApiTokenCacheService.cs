@@ -6,10 +6,11 @@ namespace AspNetCore.Authentication.ApiToken.Abstractions
     {
         Task<ApiTokenCache> GetAsync(string token);
 
-        Task SetAsync(ApiTokenModel token);
+        Task SetAsync(TokenModel token);
 
         Task SetNullAsync(string invalidToken);
 
-        Task RemoveAsync(ApiTokenModel token,string reason=null);
+        Task RemoveAsync(string token,string reason=null);
+        Task InitializeAsync();
     }
 }

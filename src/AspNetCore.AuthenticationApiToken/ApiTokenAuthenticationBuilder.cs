@@ -1,6 +1,9 @@
-﻿using AspNetCore.Authentication.ApiToken.Abstractions;
+﻿using System;
+using AspNetCore.Authentication.ApiToken.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace AspNetCore.Authentication.ApiToken
 {
@@ -22,6 +25,15 @@ namespace AspNetCore.Authentication.ApiToken
         public ApiTokenAuthenticationBuilder AddTokenStore<TTokenStore>() where TTokenStore : class
         {
             Services.AddScoped(typeof(IApiTokenStore), typeof(TTokenStore));
+            return this;
+        }
+
+        public ApiTokenAuthenticationBuilder AddCache<TCacheService, TCacheOptions>(Action<TCacheOptions> configureOptions) 
+            where TCacheService:IApiTokenCacheService
+            where TCacheOptions : ApiTokenCacheOptions
+        {
+            Services.Configure(configureOptions);
+            Services.Replace(ServiceDescriptor.Singleton(typeof(IApiTokenCacheService),typeof(TCacheService)));
             return this;
         }
     }

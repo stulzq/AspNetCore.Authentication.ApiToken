@@ -7,21 +7,6 @@ namespace AspNetCore.Authentication.ApiToken
     public class ApiTokenOptions : AuthenticationSchemeOptions
     {
         /// <summary>
-        /// Set where to parse the token. Default <see cref="ApiTokenParseType.Both"/>
-        /// </summary>
-        public ApiTokenParseType ParseType { get; set; } = ApiTokenParseType.Both;
-
-        /// <summary>
-        /// Token parse from request header key. Default <see cref="ApiTokenDefaults.TokenParseHeaderKey"/>
-        /// </summary>
-        public string HeaderKey { get; set; } = ApiTokenDefaults.TokenParseHeaderKey;
-
-        /// <summary>
-        /// Token parse from request querystring key. Default <see cref="ApiTokenDefaults.TokenParseQueryStringKey"/>
-        /// </summary>
-        public string QueryStringKey { get; set; } = ApiTokenDefaults.TokenParseQueryStringKey;
-
-        /// <summary>
         /// Defines whether the token validation errors should be returned to the caller.
         /// Enabled by default, this option can be disabled to prevent the JWT handler
         /// from returning an error and an error_description in the WWW-Authenticate header.
@@ -45,11 +30,24 @@ namespace AspNetCore.Authentication.ApiToken
         }
 
         /// <summary>
+        /// Set where to parse the token. Default <see cref="ApiTokenParseType.Both"/>
+        /// </summary>
+        public ApiTokenParseType ParseType { get; set; } = ApiTokenParseType.Both;
+
+        /// <summary>
+        /// Token parse from request header key. Default <see cref="ApiTokenDefaults.TokenParseHeaderKey"/>
+        /// </summary>
+        public string HeaderKey { get; set; } = ApiTokenDefaults.TokenParseHeaderKey;
+
+        /// <summary>
+        /// Token parse from request querystring key. Default <see cref="ApiTokenDefaults.TokenParseQueryStringKey"/>
+        /// </summary>
+        public string QueryStringKey { get; set; } = ApiTokenDefaults.TokenParseQueryStringKey;
+
+        /// <summary>
         /// ApiToken expire time. Default: 1 hour.
         /// </summary>
         public TimeSpan TokenExpire { get; set; } = TimeSpan.FromHours(1);
-
-        public TimeSpan TokenExpireClockSkew { get; set; } = TimeSpan.FromMinutes(10);
 
         /// <summary>
         /// Refresh token expire time. Default: 24 hour.
@@ -57,22 +55,24 @@ namespace AspNetCore.Authentication.ApiToken
         public TimeSpan RefreshTokenExpire { get; set; } = TimeSpan.FromHours(24);
 
         /// <summary>
-        /// If set up to false,Repeated creation of token (<see cref="IApiTokenOperator.CreateAsync"/>) will invalidate the old token for one user.
+        /// If set up to false,Repeated creation of token (<see cref="IApiTokenOperator.CreateAsync"/>) will invalidate the old token for user.
         /// </summary>
         public bool AllowMultiTokenActive { get; set; } = true;
 
         /// <summary>
-        /// Hosted Service Periodically run clean stored expired token, use <see cref="IApiTokenStore.RemoveExpirationAsync"/>. Unit: sec.
+        /// Background Service periodically run clean stored expired token, will call <see cref="IApiTokenStore.RemoveExpirationAsync"/>. Unit: second.
+        /// <para></para>
+        /// * If set value to 0, the service will not start.
         /// </summary>
         public int ExpiredTokenCleanInterval { get; set; } = 86400;
 
-
         /// <summary>
-        /// Use cache <see cref="IApiTokenCacheService"/>
+        /// Use caching to improve performance, the cache service implementation interface <see cref="IApiTokenCacheService"/>.
         /// </summary>
         public bool UseCache { get; set; } = false;
 
         public string RoleClaimType { get; set; } = ApiTokenClaimTypes.Role;
+
         public string NameClaimType { get; set; } = ApiTokenClaimTypes.Name;
 
     }

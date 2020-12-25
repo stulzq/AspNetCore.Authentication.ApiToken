@@ -21,7 +21,7 @@ namespace AspNetCore.Authentication.ApiToken
         }
         public virtual async Task<ClaimsPrincipal> ValidateTokenAsync([NotNull] string token, string schemeName)
         {
-            ApiTokenModel tokenModel = null;
+            TokenModel tokenModel = null;
 
             //Get from cache
             if (_options.UseCache)
@@ -32,7 +32,12 @@ namespace AspNetCore.Authentication.ApiToken
                 {
                     if (!tokenCache.Available)
                     {
-                        throw new TokenInvalidException(tokenCache.Reason ?? "invalid_token");
+                        if (tokenCache.Reason == ApiTokenGlobalSettings.Reason.NotAllowMultiTokenActive)
+                        {
+                            throw new TokenMultiActiveException();
+                        }
+
+                        throw new TokenInvalidException(tokenCache.Reason);
                     }
 
                     tokenModel = tokenCache.Token;
@@ -58,11 +63,11 @@ namespace AspNetCore.Authentication.ApiToken
                     await _cacheService.SetNullAsync(token);
                 }
 
-                throw new TokenInvalidException("invalid_token");
+                throw new TokenInvalidException();
             }
 
             //Check expiration
-            if (tokenModel.IsExpired(_options.TokenExpireClockSkew))
+            if (!tokenModel.IsValid)
             {
                 throw new TokenExpiredException(tokenModel.Expiration.DateTime);
             }

@@ -1,8 +1,8 @@
 ﻿namespace AspNetCore.Authentication.ApiToken
 {
-    public enum ApiTokenType
+    public enum TokenType
     {
-        ApiToken=0,
+        Bearer=0,
         Refresh
     }
 }

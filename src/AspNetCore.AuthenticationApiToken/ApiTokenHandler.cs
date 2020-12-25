@@ -185,7 +185,7 @@ namespace AspNetCore.Authentication.ApiToken
                 {
                     new AuthenticationToken { Name = ApiTokenDefaults.ApiTokenName, Value = token }
                 });
-                
+
                 tokenValidatedContext.Success();
                 return tokenValidatedContext.Result;
             }
@@ -295,7 +295,7 @@ namespace AspNetCore.Authentication.ApiToken
             {
                 TokenExpiredException ee =>
                     $"The token expired at '{ee.ExpireAt.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'",
-                TokenInvalidException ue => ue.Message,
+                TokenInvalidException ue => string.IsNullOrEmpty(ue.Message) ? "invalid_token" : ue.Message,
                 _ => authFailure.Message
             };
 

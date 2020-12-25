@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiToken.Abstractions;
 using MessagePack;
 using MessagePack.Resolvers;
@@ -10,28 +9,26 @@ namespace AspNetCore.Authentication.ApiToken.Redis
 {
     public class RedisTokenCacheService : IApiTokenCacheService
     {
-        private readonly ApiTokenOptions _tokenOptions;
         private readonly RedisTokenCacheOptions _options;
-
-        private readonly IDatabase _cache;
-
+        private IDatabase _cache;
         private readonly string _tokenCacheKeyPrefix;
-        public RedisTokenCacheService(IOptions<RedisTokenCacheOptions> options, 
-            IOptions<ApiTokenOptions> tokenOptions)
+        public RedisTokenCacheService(IOptions<RedisTokenCacheOptions> options)
         {
-            _tokenOptions = tokenOptions.Value;
             _options = options.Value;
-
-            var connection = ConnectionMultiplexer.Connect(_options.ConnectionString);
-            _cache = connection.GetDatabase();
-
             _tokenCacheKeyPrefix = _options.CachePrefix + "token:{0}";
+        }
+
+        public async Task InitializeAsync()
+        {
+            var connection = await ConnectionMultiplexer.ConnectAsync(_options.ConnectionString);
+            _cache = connection.GetDatabase();
         }
 
 
         public async Task<ApiTokenCache> GetAsync(string token)
         {
-            var cacheData = await _cache.StringGetAsync(_tokenCacheKeyPrefix);
+            var key = string.Format(_tokenCacheKeyPrefix, token);
+            var cacheData = await _cache.StringGetAsync(key);
             if (!cacheData.HasValue)
             {
                 return default;
@@ -40,43 +37,41 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             return MessagePackSerializer.Deserialize<ApiTokenCache>(cacheData, ContractlessStandardResolver.Options);
         }
 
-        public async Task SetAsync(ApiTokenModel token)
+        public async Task SetAsync(TokenModel token)
         {
-            TimeSpan ttl;
-            if (token.IsExpired(_tokenOptions.TokenExpireClockSkew))
+            var key = string.Format(_tokenCacheKeyPrefix, token.Value);
+            if (!token.IsValid)
             {
-                ttl = _tokenOptions.TokenExpireClockSkew;
-            }
-            else
-            {
-                ttl= token.GetLifeTime(_tokenOptions.TokenExpireClockSkew);
+                return;
             }
 
-            await _cache.StringSetAsync(_tokenCacheKeyPrefix, Serialize(new ApiTokenCache() { Token = token }), ttl);
+            await _cache.StringSetAsync(key, Serialize(new ApiTokenCache() { Token = token }), token.LifeTime);
         }
 
         public async Task SetNullAsync(string invalidToken)
         {
-            if (_options.PreventPenetration != null)
+            var key = string.Format(_tokenCacheKeyPrefix, invalidToken);
+            if (_options.InvalidTokenNullCacheTTL != null)
             {
-                var cacheData = new ApiTokenCache();
-                var ttl = _options.PreventPenetration.Value;
-
-                await _cache.StringSetAsync(_tokenCacheKeyPrefix, Serialize(cacheData), ttl);
+                var nullCache = new ApiTokenCache();
+                var ttl = _options.InvalidTokenNullCacheTTL.Value;
+                await _cache.StringSetAsync(key, Serialize(nullCache), ttl);
             }
         }
 
-        public async Task RemoveAsync(ApiTokenModel token, string reason = null)
+        public async Task RemoveAsync(string token, string reason = null)
         {
-            var key = string.Format(_tokenCacheKeyPrefix, token.Token);
-            if (string.IsNullOrEmpty(reason))
+            var key = string.Format(_tokenCacheKeyPrefix, token);
+
+            if (_options.InvalidTokenReasonCacheTTL != null && !string.IsNullOrEmpty(reason))
             {
-                await _cache.KeyDeleteAsync(key);
+                await _cache.StringSetAsync(key, Serialize(new ApiTokenCache() {Reason = reason}),
+                    _options.InvalidTokenReasonCacheTTL.Value);
             }
             else
             {
-                var ttl = _tokenOptions.TokenExpireClockSkew;
-                await _cache.KeyExpireAsync(key,ttl);
+
+                await _cache.KeyDeleteAsync(key);
             }
         }
 

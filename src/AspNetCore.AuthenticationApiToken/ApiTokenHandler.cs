@@ -294,7 +294,6 @@ namespace AspNetCore.Authentication.ApiToken
             {
                 TokenExpiredException ee =>
                     $"The token expired at '{ee.ExpireAt.LocalDateTime.ToString(CultureInfo.InvariantCulture)}'",
-                TokenInvalidException ue => ue.Message,
                 _ => authFailure.Message
             };
 

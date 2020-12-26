@@ -61,7 +61,7 @@ namespace AspNetCore.Authentication.ApiToken
                     await _cacheService.SetNullAsync(token);
                 }
 
-                throw new TokenInvalidException();
+                throw new TokenInvalidException("not found");
             }
 
             //Check expiration

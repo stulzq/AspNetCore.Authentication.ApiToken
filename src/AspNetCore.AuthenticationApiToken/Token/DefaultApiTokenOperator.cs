@@ -74,7 +74,8 @@ namespace AspNetCore.Authentication.ApiToken
 
         private TokenCreateResult CreateToken(string userId, List<Claim> claims, string scheme)
         {
-            userId = $"{userId}{scheme}";
+            userId = $"{userId}_{scheme}";
+            var userRefresh = $"{userId}_{scheme}_refresh";
             var now = DateTime.Now;
             var token = new TokenModel()
             {
@@ -88,7 +89,7 @@ namespace AspNetCore.Authentication.ApiToken
 
             var refreshToken = new TokenModel()
             {
-                Value = ApiTokenTools.CreateToken(userId),
+                Value = ApiTokenTools.CreateToken(userRefresh),
                 CreateTime = now,
                 Type = TokenType.Refresh,
                 UserId = userId,

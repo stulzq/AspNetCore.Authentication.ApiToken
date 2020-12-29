@@ -31,7 +31,8 @@ namespace AspNetCore.ApiToken.SampleApp
                 .AddApiToken(op => op.UseCache = false)
                 // .AddRedisCache(op => op.ConnectionString = "192.168.3.57:6379")
                 .AddProfileService<MyApiTokenProfileService>()
-                .AddTokenStore<MyApiTokenStore>();
+                .AddTokenStore<MyApiTokenStore>()
+                .AddCleanService();
             // .AddRedisCache(op=>op.ConnectionString="xxx");
 
             services.AddControllers().AddNewtonsoftJson(op =>

@@ -53,4 +53,4 @@ dotnet ef database update
 
 Gif:
 
-![image-op](assets/op.gif)
+![image-op](../../assets/op.gif)

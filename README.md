@@ -1,10 +1,7 @@
 # AspNetCore.Authentication.ApiToken
 
-**Tips: This project is under development, please do not use it in production**
+English | [中文](README_zh-CN.md)
 
-TODO:
+[![Latest version](https://img.shields.io/nuget/v/AspNetCore.Authentication.ApiToken.svg)](https://www.nuget.org/packages/AspNetCore.Authentication.ApiToken/) 
 
-- [ ] Logging
-- [ ] Code annotation
-- [ ] Document
-- [ ] More cache impl
+The English document is being prepared. You can view the Chinese document temporarily.

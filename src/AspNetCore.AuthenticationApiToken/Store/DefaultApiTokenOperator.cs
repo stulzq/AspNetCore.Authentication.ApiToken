@@ -61,7 +61,7 @@ namespace AspNetCore.Authentication.ApiToken
 
             var result = CreateToken(userId, claims, _innerScheme);
 
-            await RemoveAllOldTokenAsync(userId, scheme);
+            await RemoveAllOldTokenAsync(userId, _innerScheme);
 
             await _tokenStore.StoreAsync(new List<TokenModel>() { result.Bearer, result.Refresh });
 
@@ -76,7 +76,7 @@ namespace AspNetCore.Authentication.ApiToken
         public virtual async Task<TokenCreateResult> RefreshAsync(string refreshToken, string scheme = null)
         {
             await InitializeAsync(scheme);
-            var token = await _tokenStore.GetAsync(refreshToken, scheme);
+            var token = await _tokenStore.GetAsync(refreshToken, _innerScheme);
             if (token == null || token.Type != TokenType.Refresh)
             {
                 return TokenCreateResult.Failed("invalid refresh_token");
@@ -90,11 +90,11 @@ namespace AspNetCore.Authentication.ApiToken
             var claims = await GetUserClaimsAsync(token.UserId);
             var result = CreateToken(token.UserId, claims, _innerScheme);
 
-            await _tokenStore.RemoveAsync(refreshToken, scheme);
+            await _tokenStore.RemoveAsync(refreshToken, _innerScheme);
 
             if (_options.AllowMultiTokenActive && _options.KeepTokenValidTimeSpanOnRefresh != null)
             {
-                var tokenList = await _tokenStore.GetListAsync(token.UserId, scheme, TokenType.Bearer);
+                var tokenList = await _tokenStore.GetListAsync(token.UserId, _innerScheme, TokenType.Bearer);
                 var validTokenList = tokenList
                     .Where(a => a.Expiration - DateTime.Now > _options.KeepTokenValidTimeSpanOnRefresh).ToList();
                 validTokenList.ForEach(a => a.Expiration = DateTime.Now + _options.KeepTokenValidTimeSpanOnRefresh.Value);
@@ -106,7 +106,7 @@ namespace AspNetCore.Authentication.ApiToken
                 await _tokenStore.UpdateListAsync(validTokenList);
             }
 
-            await RemoveAllOldTokenAsync(token.UserId, scheme);
+            await RemoveAllOldTokenAsync(token.UserId, _innerScheme);
 
             await _tokenStore.StoreAsync(new List<TokenModel>() { result.Bearer, result.Refresh });
 
@@ -121,7 +121,7 @@ namespace AspNetCore.Authentication.ApiToken
         public virtual async Task<RefreshClaimsResult> RefreshClaimsAsync(string token, string scheme = null)
         {
             await InitializeAsync(scheme);
-            var tokenModel = await _tokenStore.GetAsync(token, scheme);
+            var tokenModel = await _tokenStore.GetAsync(token, _innerScheme);
             if (tokenModel == null || tokenModel.Type != TokenType.Bearer)
             {
                 return RefreshClaimsResult.Failed("invalid token");
@@ -145,7 +145,7 @@ namespace AspNetCore.Authentication.ApiToken
         public virtual async Task RemoveAsync(string token, string scheme = null)
         {
             await InitializeAsync(scheme);
-            var tokenModel = await _tokenStore.GetAsync(token, scheme);
+            var tokenModel = await _tokenStore.GetAsync(token, _innerScheme);
             if (tokenModel == null)
             {
                 return;
@@ -154,11 +154,11 @@ namespace AspNetCore.Authentication.ApiToken
             //Remove from cache
             if (_options.UseCache)
             {
-                await _cacheService.RemoveAsync(tokenModel.Value, scheme);
+                await _cacheService.RemoveAsync(tokenModel.Value, _innerScheme);
             }
 
             //Remove from db
-            await _tokenStore.RemoveAsync(token, scheme);
+            await _tokenStore.RemoveAsync(token, _innerScheme);
         }
 
         private async Task<List<Claim>> GetUserClaimsAsync(string userId)

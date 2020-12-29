@@ -25,7 +25,7 @@ namespace AspNetCore.Authentication.ApiToken
             if (options.UseCache)
             {
                 var tokenModelCache = await _cacheService.GetAsync(token);
-                if (tokenModelCache != null )
+                if (tokenModelCache != null)
                 {
                     if (tokenModelCache.Available)
                     {
@@ -33,7 +33,7 @@ namespace AspNetCore.Authentication.ApiToken
                     }
                     else
                     {
-                        throw new TokenInvalidException("not found");
+                        throw new TokenInvalidException("matching token could not be found from cache");
                     }
                 }
             }
@@ -42,7 +42,7 @@ namespace AspNetCore.Authentication.ApiToken
             if (tokenModel == null)
             {
                 var queryTokenModel = await _store.GetAsync(token);
-                if (queryTokenModel.IsValid)
+                if (queryTokenModel != null && queryTokenModel.IsValid)
                     tokenModel = queryTokenModel;
 
                 //set cache
@@ -59,7 +59,7 @@ namespace AspNetCore.Authentication.ApiToken
                     await _cacheService.SetNullAsync(token);
                 }
 
-                throw new TokenInvalidException("not found");
+                throw new TokenInvalidException("matching token could not be found");
             }
 
             //Check expiration

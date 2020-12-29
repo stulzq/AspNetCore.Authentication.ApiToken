@@ -25,12 +25,7 @@ namespace AspNetCore.ApiToken.SampleApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(ApiTokenDefaults.AuthenticationScheme)
-                .AddApiToken(ApiTokenDefaults.AuthenticationScheme, null, op =>
-                {
-                    op.ParseType = ApiTokenParseType.QueryString;
-                    op.Challenge = "xxx";
-
-                })
+                .AddApiToken()
                 .AddRedisCache(op => op.ConnectionString = "192.168.3.57:6379")
                 .AddProfileService<MyApiTokenProfileService>()
                 .AddTokenStore<MyApiTokenStore>();

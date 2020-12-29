@@ -4,6 +4,16 @@
 
 AspNetCore.Authentication.ApiToken 是一个用于 ASP.NET Core 的认证组件，遵循 ASP.NET Core 的认证框架设计规范。它主要用于 WebApi 项目，提供**签发**和**校验** Token 的能力。本组件签发的 Token 非 Json Web Token(JWT)，类似于 IdentityServer4 中的 Reference Token，需要在服务端查询来进行有效性的验证。如果在你的项目中有 IdentityServer4 中的 Reference Token 需求，那么在中大型项目中推荐使用 IdentityServer4，如果是中小型项目，那么你可以考虑 AspNetCore.Authentication.ApiToken，它比 IdentityServer4 更加的轻便，接入和维护成本更低。此 Token 比 JWT 带来的优势是可以完全控制 Token 的生命周期，缺点是验证 Token 需要每次查询存储来比对验证（可以通过缓存来提升性能）。
 
+## 功能
+
+- 接入简单，只需要实现两个接口
+- 一体化签发、刷新、注销和验证 Token
+- 支持缓存，默认已实现 Redis，可轻松扩展其它缓存
+- 支持定期清理过期 Token 后台任务
+- 支持更新用户 Claim （角色）立即生效，无需重新登录
+- 认证事件
+
+
 ## 快速入门
 
 ### 1.安装
@@ -239,7 +249,7 @@ Startup.cs
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddAuthentication(ApiTokenDefaults.AuthenticationScheme)
-        .AddApiToken(ApiTokenDefaults.AuthenticationScheme)
+        .AddApiToken()
         .AddProfileService<MyApiTokenProfileService>()
         .AddTokenStore<MyApiTokenStore>();
     //Other services...
@@ -259,6 +269,10 @@ var createResult = await tokenOperator.CreateAsync("<用户Id>");
 ````
 
 返回的结果中包含了 Bearer Token 和 Refresh Token。Bearer Token 用于接口验证，Refresh Token 用于 Token 的刷新
+
+## 进阶
+
+
 
 ## 感谢
 

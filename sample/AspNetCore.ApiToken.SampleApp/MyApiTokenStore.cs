@@ -21,6 +21,10 @@ namespace AspNetCore.ApiToken.SampleApp
 
         public Task<TokenModel> GetAsync(string token)
         {
+            if (token != "A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A91257")
+            {
+                return Task.FromResult(default(TokenModel));
+            }
             return Task.FromResult(new TokenModel()
             {
                 Claims = new Claim[]

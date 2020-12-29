@@ -31,11 +31,11 @@ namespace AspNetCore.ApiToken.SampleApp
                     op.Challenge = "xxx";
 
                 })
-                .AddCleanService()
+                .AddRedisCache(op => op.ConnectionString = "192.168.3.57:6379")
                 .AddProfileService<MyApiTokenProfileService>()
                 .AddTokenStore<MyApiTokenStore>();
-                // .AddRedisCache(op=>op.ConnectionString="xxx");
-            
+            // .AddRedisCache(op=>op.ConnectionString="xxx");
+
             services.AddControllers().AddNewtonsoftJson(op =>
             {
                 op.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;

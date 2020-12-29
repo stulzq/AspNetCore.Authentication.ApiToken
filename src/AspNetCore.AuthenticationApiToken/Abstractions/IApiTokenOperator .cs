@@ -10,6 +10,6 @@ namespace AspNetCore.Authentication.ApiToken.Abstractions
 
         Task<RefreshClaimsResult> RefreshClaimsAsync(string token, string scheme = null);
 
-        Task RemoveAsync(string token, string reason = null, string scheme = null);
+        Task RemoveAsync(string token, string scheme = null);
     }
 }

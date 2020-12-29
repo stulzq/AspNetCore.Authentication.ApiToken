@@ -110,7 +110,7 @@ namespace AspNetCore.Authentication.ApiToken
                     var tokenList = await _tokenStore.GetListAsync(userId);
                     foreach (var token in tokenList)
                     {
-                        await _cacheService.RemoveAsync(token.Value, ApiTokenGlobalSettings.Reason.NotAllowMultiTokenActive);
+                        await _cacheService.RemoveAsync(token.Value);
                     }
                 }
 
@@ -136,8 +136,8 @@ namespace AspNetCore.Authentication.ApiToken
             var claims = await GetUserClaimsAsync(token.UserId);
             var result = CreateToken(token.UserId, claims, _innerScheme);
 
-            await RemoveOldTokenAsync(token.UserId);
             await _tokenStore.RemoveAsync(refreshToken);
+            await RemoveOldTokenAsync(token.UserId);
 
             await _tokenStore.StoreAsync(new List<TokenModel>() { result.Bearer, result.Refresh });
 
@@ -173,7 +173,7 @@ namespace AspNetCore.Authentication.ApiToken
             return RefreshClaimsResult.Success();
         }
 
-        public virtual async Task RemoveAsync(string token, string reason = null, string scheme = null)
+        public virtual async Task RemoveAsync(string token, string scheme = null)
         {
             await InitializeAsync(scheme);
             var tokenModel = await _tokenStore.GetAsync(token);
@@ -185,7 +185,7 @@ namespace AspNetCore.Authentication.ApiToken
             //Remove from cache
             if (_options.UseCache)
             {
-                await _cacheService.RemoveAsync(tokenModel.Value, reason);
+                await _cacheService.RemoveAsync(tokenModel.Value);
             }
 
             //Remove from db

@@ -61,6 +61,7 @@ namespace AspNetCore.Authentication.ApiToken
             var tokenStore = scope.ServiceProvider.GetRequiredService<IApiTokenStore>();
             var cleanCount = await tokenStore.RemoveExpirationAsync();
 
+            await _cache.LockReleaseAsync(LockKey, lockValue);
             _logger.LogInformation($"{cleanCount} expired token records have been deleted.");
         }
 

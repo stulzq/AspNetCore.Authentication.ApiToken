@@ -21,13 +21,5 @@ namespace AspNetCore.Authentication.ApiToken
         /// </summary>
         public string CachePrefix { get; set; } = "aspnetcore:authentication";
 
-        /// <summary>
-        /// The invalid token will be remove immediately by the token store,
-        /// but he token's invalid reason can be cached and used to return to the client.
-        /// This option represents the TTL of the cache for token's invalid reason.
-        /// <para></para>
-        /// * If set value to null, it will not take effect.
-        /// </summary>
-        public TimeSpan? InvalidTokenReasonCacheTTL { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             _logger.LogInformation("Redis token cache service init successful.");
         }
 
-        public async Task<ApiTokenCache> GetAsync(string token)
+        public async Task<TokenModelCache> GetAsync(string token)
         {
             var key = string.Format(_tokenCacheKeyPrefix, token);
             var cacheData = await _cache.StringGetAsync(key);
@@ -40,18 +40,14 @@ namespace AspNetCore.Authentication.ApiToken.Redis
                 return default;
             }
 
-            return MessagePackSerializer.Deserialize<ApiTokenCache>(cacheData, ContractlessStandardResolver.Options);
+            return MessagePackSerializer.Deserialize<TokenModelCache>(cacheData, ContractlessStandardResolver.Options);
         }
 
         public async Task SetAsync(TokenModel token)
         {
             var key = string.Format(_tokenCacheKeyPrefix, token.Value);
-            if (!token.IsValid)
-            {
-                return;
-            }
 
-            await _cache.StringSetAsync(key, Serialize(new ApiTokenCache() { Token = token }), token.LifeTime);
+            await _cache.StringSetAsync(key, Serialize(new TokenModelCache(){Token = token }), token.LifeTime);
         }
 
         public async Task SetNullAsync(string invalidToken)
@@ -59,26 +55,16 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             var key = string.Format(_tokenCacheKeyPrefix, invalidToken);
             if (_options.InvalidTokenNullCacheTTL != null)
             {
-                var nullCache = new ApiTokenCache();
                 var ttl = _options.InvalidTokenNullCacheTTL.Value;
-                await _cache.StringSetAsync(key, Serialize(nullCache), ttl);
+                await _cache.StringSetAsync(key, Serialize(new TokenModelCache()), ttl);
             }
         }
 
-        public async Task RemoveAsync(string token, string reason = null)
+        public async Task RemoveAsync(string token)
         {
             var key = string.Format(_tokenCacheKeyPrefix, token);
 
-            if (_options.InvalidTokenReasonCacheTTL != null && !string.IsNullOrEmpty(reason))
-            {
-                await _cache.StringSetAsync(key, Serialize(new ApiTokenCache() { Reason = reason }),
-                    _options.InvalidTokenReasonCacheTTL.Value);
-            }
-            else
-            {
-
-                await _cache.KeyDeleteAsync(key);
-            }
+            await _cache.KeyDeleteAsync(key);
         }
 
         public async Task<bool> LockTakeAsync(string key, string value, TimeSpan timeOut)
@@ -97,7 +83,7 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             }
         }
 
-        private static byte[] Serialize(ApiTokenCache data)
+        private static byte[] Serialize(TokenModelCache data)
         {
             return MessagePackSerializer.Serialize(data, ContractlessStandardResolver.Options);
         }

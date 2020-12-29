@@ -24,28 +24,26 @@ namespace AspNetCore.Authentication.ApiToken
             //Get from cache
             if (options.UseCache)
             {
-                var tokenCache = await _cacheService.GetAsync(token);
-
-                if (tokenCache != null)
+                var tokenModelCache = await _cacheService.GetAsync(token);
+                if (tokenModelCache != null )
                 {
-                    if (!tokenCache.Available)
+                    if (tokenModelCache.Available)
                     {
-                        if (tokenCache.Reason == ApiTokenGlobalSettings.Reason.NotAllowMultiTokenActive)
-                        {
-                            throw new TokenMultiActiveException(tokenCache.Reason);
-                        }
-
-                        throw new TokenInvalidException(tokenCache.Reason);
+                        tokenModel = tokenModelCache.Token;
                     }
-
-                    tokenModel = tokenCache.Token;
+                    else
+                    {
+                        throw new TokenInvalidException("not found");
+                    }
                 }
             }
 
             //If cache return null, then get from db
             if (tokenModel == null)
             {
-                tokenModel = await _store.GetAsync(token);
+                var queryTokenModel = await _store.GetAsync(token);
+                if (queryTokenModel.IsValid)
+                    tokenModel = queryTokenModel;
 
                 //set cache
                 if (tokenModel != null && options.UseCache)

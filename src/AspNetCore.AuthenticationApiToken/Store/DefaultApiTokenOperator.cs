@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiToken.Abstractions;
+using AspNetCore.Authentication.ApiToken.Results;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
@@ -173,12 +174,12 @@ namespace AspNetCore.Authentication.ApiToken
 
         private TokenCreateResult CreateToken(string userId, List<Claim> claims, string scheme)
         {
-            userId = $"{userId}_{scheme}";
-            var userRefresh = $"{userId}_{scheme}_refresh";
+            var bearerParam = $"{userId}_{scheme}_bearer";
+            var refreshParam = $"{userId}_{scheme}_refresh";
             var now = DateTime.Now;
             var token = new TokenModel()
             {
-                Value = ApiTokenTools.CreateToken(userId),
+                Value = ApiTokenTools.CreateToken(bearerParam),
                 CreateTime = now,
                 Type = TokenType.Bearer,
                 UserId = userId,
@@ -189,7 +190,7 @@ namespace AspNetCore.Authentication.ApiToken
 
             var refreshToken = new TokenModel()
             {
-                Value = ApiTokenTools.CreateToken(userRefresh),
+                Value = ApiTokenTools.CreateToken(refreshParam),
                 CreateTime = now,
                 Type = TokenType.Refresh,
                 UserId = userId,

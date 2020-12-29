@@ -20,7 +20,7 @@
     "AspNetCore.ApiToken.SampleApp": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "token?apitoken=A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A912572",
+      "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

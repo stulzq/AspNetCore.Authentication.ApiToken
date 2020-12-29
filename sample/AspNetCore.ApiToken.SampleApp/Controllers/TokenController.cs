@@ -23,8 +23,8 @@ namespace AspNetCore.ApiToken.SampleApp.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Validate()
         {
             return Ok(
                 new

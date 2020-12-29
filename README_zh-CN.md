@@ -274,7 +274,17 @@ var createResult = await tokenOperator.CreateAsync("<用户Id>");
 
 ## 进阶
 
+使用缓存
 
+实现自定义缓存
+
+定期清理服务
+
+使用刷新token
+
+更新claim
+
+注销token
 
 ## 感谢
 

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using AspNetCore.Authentication.ApiToken.Results;
 
 namespace AspNetCore.Authentication.ApiToken.Abstractions
 {

@@ -1,14 +1,17 @@
 using System;
 using System.IO;
+using AspNetCore.ApiToken.SampleApp.Store;
 using AspNetCore.Authentication.ApiToken;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace AspNetCore.ApiToken.SampleApp
 {
@@ -25,8 +28,8 @@ namespace AspNetCore.ApiToken.SampleApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(ApiTokenDefaults.AuthenticationScheme)
-                .AddApiToken()
-                .AddRedisCache(op => op.ConnectionString = "192.168.3.57:6379")
+                .AddApiToken(op => op.UseCache = false)
+                // .AddRedisCache(op => op.ConnectionString = "192.168.3.57:6379")
                 .AddProfileService<MyApiTokenProfileService>()
                 .AddTokenStore<MyApiTokenStore>();
             // .AddRedisCache(op=>op.ConnectionString="xxx");
@@ -42,22 +45,41 @@ namespace AspNetCore.ApiToken.SampleApp
             services.AddSwaggerGen(op =>
             {
                 op.UseInlineDefinitionsForEnums();
-
                 op.SwaggerDoc("v1",
                     new OpenApiInfo { Title = typeof(Startup).Namespace, Version = "v1" });
                 op.DocInclusionPredicate((docName, description) => true);
 
-                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                foreach (var file in Directory.GetFiles(baseDirectory))
+                op.AddSecurityDefinition("ApiToken", new OpenApiSecurityScheme
                 {
-                    if (Path.GetExtension(file).ToLower() == ".xml")
+                    Description = "Input Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "ApiToken"
+                });
+                op.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
                     {
-                        op.IncludeXmlComments(file, true);
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "ApiToken"
+                            }
+                        },
+                        new string[] { }
                     }
-                }
+                });
 
             });
             services.AddSwaggerGenNewtonsoftSupport();
+
+            services.AddDbContext<ApiTokenDbContext>(options => options.UseMySql(
+                Configuration.GetConnectionString("DefaultConnection"),
+                ServerVersion.FromString("5.7-mysql"),
+                mySqlOptions => mySqlOptions
+                    .CharSetBehavior(CharSetBehavior.NeverAppend)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,12 +89,7 @@ namespace AspNetCore.ApiToken.SampleApp
             {
                 app.UseDeveloperExceptionPage();
 
-                app.UseSwagger(c =>
-                    {
-                        c.RouteTemplate = "swagger/{documentName}/swagger.json";
-
-                    }
-                );
+                app.UseSwagger();
                 app.UseSwaggerUI(op =>
                 {
                     op.SwaggerEndpoint($"/swagger/v1/swagger.json",

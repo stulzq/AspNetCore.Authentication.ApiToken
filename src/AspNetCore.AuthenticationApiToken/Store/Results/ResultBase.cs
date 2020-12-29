@@ -1,4 +1,4 @@
-﻿namespace AspNetCore.Authentication.ApiToken
+﻿namespace AspNetCore.Authentication.ApiToken.Results
 {
     public class ResultBase
     {

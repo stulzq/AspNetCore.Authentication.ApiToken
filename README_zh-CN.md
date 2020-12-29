@@ -185,6 +185,8 @@ Authorization: Bearer <token>
 
 ### 1.使用缓存
 
+安装包：`AspNetCore.Authentication.ApiToken.Redis`
+
 在注册服务中添加 `AddRedisCache(op => op.ConnectionString = "<redis连接字符串>")`
 
 示例：

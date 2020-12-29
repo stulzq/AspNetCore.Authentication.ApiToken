@@ -17,6 +17,7 @@ namespace AspNetCore.ApiToken.UnitTests
         public void CreateToken()
         {
             var token = ApiTokenTools.CreateToken("1");
+            Assert.Equal(64, token.Length);
             _outputHelper.WriteLine(token);
         }
     }

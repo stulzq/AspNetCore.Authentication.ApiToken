@@ -193,7 +193,7 @@ Authorization: Bearer <token>
 
 ```csharp
 services.AddAuthentication(ApiTokenDefaults.AuthenticationScheme)
-    .AddApiToken(op => op.UseCache = false)
+    .AddApiToken(op => op.UseCache = true)
     .AddRedisCache(op => op.ConnectionString = "127.0.0.1:6379")
     .AddProfileService<MyApiTokenProfileService>()
     .AddTokenStore<MyApiTokenStore>();

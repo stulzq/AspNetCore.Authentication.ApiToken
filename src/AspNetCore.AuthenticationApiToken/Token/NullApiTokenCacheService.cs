@@ -6,7 +6,7 @@ namespace AspNetCore.Authentication.ApiToken
 {
     public class NullApiTokenCacheService : IApiTokenCacheService
     {
-        public Task<TokenModelCache> GetAsync(string token)
+        public Task<TokenModelCache> GetAsync(string token, string scheme)
         {
             throw new NotImplementedException();
         }
@@ -16,12 +16,12 @@ namespace AspNetCore.Authentication.ApiToken
             return Task.CompletedTask;
         }
 
-        public Task SetNullAsync(string invalidToken)
+        public Task SetNullAsync(string invalidToken, string scheme)
         {
             return Task.CompletedTask;
         }
 
-        public Task RemoveAsync(string token)
+        public Task RemoveAsync(string token, string scheme)
         {
             return Task.CompletedTask;
         }

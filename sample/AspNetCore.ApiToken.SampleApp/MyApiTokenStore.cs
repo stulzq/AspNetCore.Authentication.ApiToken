@@ -19,7 +19,7 @@ namespace AspNetCore.ApiToken.SampleApp
             return Task.CompletedTask;
         }
 
-        public Task<TokenModel> GetAsync(string token)
+        public Task<TokenModel> GetAsync(string token,string scheme)
         {
             if (token != "A27145E8ED6DEE0451A9784454148F58FF9E96DFE3228B5331C7792BD6A91257")
             {
@@ -27,7 +27,7 @@ namespace AspNetCore.ApiToken.SampleApp
             }
             return Task.FromResult(new TokenModel()
             {
-                Claims = new Claim[]
+                Claims = new List<Claim>()
                 {
                     new Claim(ClaimTypes.NameIdentifier, "1"),
                     new Claim(ApiTokenClaimTypes.Subject, "1"),
@@ -42,13 +42,13 @@ namespace AspNetCore.ApiToken.SampleApp
             });
         }
 
-        public Task<List<TokenModel>> GetListAsync(string userId)
+        public Task<List<TokenModel>> GetListAsync(string userId,string scheme)
         {
             return Task.FromResult(new List<TokenModel>()
             {
                 new TokenModel()
                 {
-                    Claims = new Claim[]
+                    Claims = new List<Claim>()
                     {
                         new Claim(ClaimTypes.NameIdentifier, "1"),
                         new Claim(ApiTokenClaimTypes.Subject, "1"),
@@ -64,18 +64,38 @@ namespace AspNetCore.ApiToken.SampleApp
             });
         }
 
-        public Task UpdateClaimsAsync(string token, IReadOnlyList<Claim> claims)
+        public Task<List<TokenModel>> GetListAsync(string userId, string scheme, TokenType type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateAsync(TokenModel token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateListAsync(List<TokenModel> token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateAsync(TokenModel token,string scheme)
         {
             throw new NotImplementedException();
         }
 
 
-        public Task RemoveAsync(string token)
+        public Task RemoveAsync(string token, string scheme)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveListAsync(string userId)
+        public Task RemoveListAsync(string userId, string scheme)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveListAsync(string userId, string scheme, TokenType type)
         {
             throw new NotImplementedException();
         }

@@ -11,7 +11,9 @@ AspNetCore.Authentication.ApiToken 是一个用于 ASP.NET Core 的认证组件�
 - 支持缓存，默认已实现 Redis，可轻松扩展其它缓存
 - 支持定期清理过期 Token 后台任务
 - 支持更新用户 Claim （角色）立即生效，无需重新登录
-- 认证事件
+- 支持同一用户同一时间只能有一个 Token 生效（签发新Token，所有旧 Token 都会失效）
+- 支持刷新 Token 时平滑过渡，旧Token不会立即失效
+- 支持认证事件
 
 
 ## 快速入门

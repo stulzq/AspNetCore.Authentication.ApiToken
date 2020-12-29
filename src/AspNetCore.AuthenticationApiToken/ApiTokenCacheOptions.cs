@@ -14,7 +14,7 @@ namespace AspNetCore.Authentication.ApiToken
         /// <para></para>
         /// * If set value to null, it will not take effect
         /// </summary>
-        public TimeSpan? InvalidTokenNullCacheTTL { get; set; } = TimeSpan.FromMinutes(10);
+        public TimeSpan? InvalidTokenNullCacheTimeSpan { get; set; } = TimeSpan.FromMinutes(10);
 
         /// <summary>
         /// Cache key prefix in redis.

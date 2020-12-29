@@ -24,7 +24,7 @@ namespace AspNetCore.Authentication.ApiToken
             //Get from cache
             if (options.UseCache)
             {
-                var tokenModelCache = await _cacheService.GetAsync(token);
+                var tokenModelCache = await _cacheService.GetAsync(token, schemeName);
                 if (tokenModelCache != null)
                 {
                     if (tokenModelCache.Available)
@@ -41,7 +41,7 @@ namespace AspNetCore.Authentication.ApiToken
             //If cache return null, then get from db
             if (tokenModel == null)
             {
-                var queryTokenModel = await _store.GetAsync(token);
+                var queryTokenModel = await _store.GetAsync(token, schemeName);
                 if (queryTokenModel != null && queryTokenModel.IsValid)
                     tokenModel = queryTokenModel;
 
@@ -56,7 +56,7 @@ namespace AspNetCore.Authentication.ApiToken
             {
                 if (options.UseCache)
                 {
-                    await _cacheService.SetNullAsync(token);
+                    await _cacheService.SetNullAsync(token, schemeName);
                 }
 
                 throw new TokenInvalidException("matching token could not be found");

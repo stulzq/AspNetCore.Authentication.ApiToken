@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AspNetCore.Authentication.ApiToken.Abstractions
@@ -7,17 +6,24 @@ namespace AspNetCore.Authentication.ApiToken.Abstractions
     public interface IApiTokenStore
     {
         Task StoreAsync(TokenModel token);
+
         Task StoreAsync(List<TokenModel> token);
 
-        Task<TokenModel> GetAsync(string token);
+        Task<TokenModel> GetAsync(string token, string scheme);
 
-        Task<List<TokenModel>> GetListAsync(string userId);
+        Task<List<TokenModel>> GetListAsync(string userId, string scheme);
 
-        Task UpdateClaimsAsync(string token,IReadOnlyList<Claim> claims);
+        Task<List<TokenModel>> GetListAsync(string userId, string scheme, TokenType type);
 
-        Task RemoveAsync(string token);
+        Task UpdateAsync(TokenModel token);
 
-        Task RemoveListAsync(string userId);
+        Task UpdateListAsync(List<TokenModel> token);
+
+        Task RemoveAsync(string token, string scheme);
+
+        Task RemoveListAsync(string userId, string scheme);
+
+        Task RemoveListAsync(string userId, string scheme, TokenType type);
 
         Task<int> RemoveExpirationAsync();
     }

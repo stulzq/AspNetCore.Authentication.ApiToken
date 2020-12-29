@@ -15,7 +15,9 @@ namespace AspNetCore.Authentication.ApiToken
 
         public string UserId { get; set; }
 
-        public IReadOnlyList<Claim> Claims { get; set; }
+        public string Scheme { get; set; }
+
+        public List<Claim> Claims { get; set; }
 
         public DateTimeOffset CreateTime { get; set; }
 

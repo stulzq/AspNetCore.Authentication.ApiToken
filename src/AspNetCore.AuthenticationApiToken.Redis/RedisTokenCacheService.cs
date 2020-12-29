@@ -20,7 +20,7 @@ namespace AspNetCore.Authentication.ApiToken.Redis
         {
             _logger = logger;
             _options = options.Value;
-            _tokenCacheKeyPrefix = _options.CachePrefix + ":token:{0}";
+            _tokenCacheKeyPrefix = _options.CachePrefix + ":{0}:token:{1}";
         }
 
         public async Task InitializeAsync()
@@ -31,9 +31,14 @@ namespace AspNetCore.Authentication.ApiToken.Redis
             _logger.LogInformation("Redis token cache service init successful.");
         }
 
-        public async Task<TokenModelCache> GetAsync(string token)
+        private string GetKey(string token, string scheme)
         {
-            var key = string.Format(_tokenCacheKeyPrefix, token);
+            return string.Format(_tokenCacheKeyPrefix, scheme, token);
+        }
+
+        public async Task<TokenModelCache> GetAsync(string token, string scheme)
+        {
+            var key = GetKey(token, scheme);
             var cacheData = await _cache.StringGetAsync(key);
             if (!cacheData.HasValue)
             {
@@ -45,24 +50,24 @@ namespace AspNetCore.Authentication.ApiToken.Redis
 
         public async Task SetAsync(TokenModel token)
         {
-            var key = string.Format(_tokenCacheKeyPrefix, token.Value);
+            var key = GetKey(token.Scheme, token.Value);
 
-            await _cache.StringSetAsync(key, Serialize(new TokenModelCache(){Token = token }), token.LifeTime);
+            await _cache.StringSetAsync(key, Serialize(new TokenModelCache() { Token = token }), token.LifeTime);
         }
 
-        public async Task SetNullAsync(string invalidToken)
+        public async Task SetNullAsync(string invalidToken, string scheme)
         {
-            var key = string.Format(_tokenCacheKeyPrefix, invalidToken);
-            if (_options.InvalidTokenNullCacheTTL != null)
+            var key = GetKey(scheme, invalidToken);
+            if (_options.InvalidTokenNullCacheTimeSpan != null)
             {
-                var ttl = _options.InvalidTokenNullCacheTTL.Value;
+                var ttl = _options.InvalidTokenNullCacheTimeSpan.Value;
                 await _cache.StringSetAsync(key, Serialize(new TokenModelCache()), ttl);
             }
         }
 
-        public async Task RemoveAsync(string token)
+        public async Task RemoveAsync(string token, string scheme)
         {
-            var key = string.Format(_tokenCacheKeyPrefix, token);
+            var key = GetKey(scheme, token);
 
             await _cache.KeyDeleteAsync(key);
         }

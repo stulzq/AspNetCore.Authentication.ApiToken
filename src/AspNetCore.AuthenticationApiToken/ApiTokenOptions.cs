@@ -68,5 +68,10 @@ namespace AspNetCore.Authentication.ApiToken
 
         public string NameClaimType { get; set; } = ApiTokenClaimTypes.Name;
 
+        /// <summary>
+        /// The time when the old bearer token is still in effect when the token is refreshed.
+        /// </summary>
+        public TimeSpan? KeepTokenValidTimeSpanOnRefresh { get; set; }
+
     }
 }

@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks Condition="'$(LibraryFrameworks)'==''">netcoreapp3.1;net5.0;</TargetFrameworks>
+    <TargetFrameworks Condition="'$(LibraryFrameworks)'!=''">$(LibraryFrameworks)</TargetFrameworks>
     <Nullable>disable</Nullable>
     <Description>A ASP.NET Core Reference Token authentication open source library.</Description>
   </PropertyGroup>
